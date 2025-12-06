@@ -1,0 +1,20 @@
+{
+  "name": "investor-finder",
+  "version": "1.0.0",
+  "description": "AI-powered investor matching tool that analyzes company websites and finds relevant investors",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^17.2.3",
+    "node-fetch": "^2.7.0",
+    "openai": "^4.20.0",
+    "stripe": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

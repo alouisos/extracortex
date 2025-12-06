@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Match | AI-Powered VC Matching</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --bg-card: #0c0c12;
+            --bg-card-hover: #12121a;
+            --bg-input: #0a0a10;
+            --accent-primary: #00d4aa;
+            --accent-secondary: #00b894;
+            --accent-glow: rgba(0, 212, 170, 0.15);
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --text-primary: #ffffff;
+            --text-secondary: #c0c0d0;
+            --text-muted: #8080a0;
+            --border-color: #1a1a25;
+            --border-hover: #2a2a3a;
+            --success: #00d4aa;
+            --warning: #fbbf24;
+            --error: #f43f5e;
+            --gradient-accent: linear-gradient(135deg, #00d4aa 0%, #00b894 50%, #059669 100%);
+            --gradient-card: linear-gradient(180deg, rgba(0, 212, 170, 0.03) 0%, transparent 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: 
+                linear-gradient(rgba(0, 212, 170, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.02) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse at 30% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
+            animation: glowPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 4rem 0 3rem;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-accent);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            display: inline-flex;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Search Section */
+        .search-section {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .search-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .search-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.125rem 1.25rem 1.125rem 3rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        .input-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            opacity: 0.5;
+        }
+
+        .btn-search {
+            background: var(--gradient-accent);
+            border: none;
+            border-radius: 14px;
+            padding: 1rem 2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-search:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-search:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            display: none;
+        }
+
+        .loading-state.active {
+            display: block;
+        }
+
+        .loading-steps {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            justify-content: center;
+        }
+
+        .loading-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            opacity: 0.4;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .loading-step.active {
+            opacity: 1;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .loading-step.complete {
+            opacity: 1;
+            border-color: var(--success);
+        }
+
+        .loading-step .step-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .loading-step.active .step-icon {
+            background: var(--accent-glow);
+        }
+
+        .loading-step.complete .step-icon {
+            background: rgba(0, 212, 170, 0.2);
+        }
+
+        .step-text {
+            text-align: center;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Company Profile Card */
+        .company-profile {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .company-profile.visible {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-accent);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .profile-info h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-info .industry {
+            color: var(--accent-primary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info .description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .profile-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .profile-tag {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .profile-tag.highlight {
+            background: var(--accent-glow);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .profile-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .results-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .results-count {
+            background: var(--accent-glow);
+            color: var(--accent-primary);
+            padding: 0.375rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Investor Cards */
+        .investors-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .investor-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .investor-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .investor-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .investor-main {
+            flex: 1;
+        }
+
+        .investor-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .investor-name a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .investor-name a:hover {
+            color: var(--accent-primary);
+        }
+
+        .verified-badge {
+            background: var(--accent-glow);
+            color: var(--accent-primary);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .investor-location {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .match-score {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .score-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .investor-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .investor-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .investor-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .investor-meta-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .investor-meta-value {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .investor-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .investor-tag {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.625rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .investor-tag.match {
+            background: var(--accent-glow);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* Team Section */
+        .team-section {
+            background: var(--bg-input);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .team-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .team-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-count {
+            background: var(--bg-card);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .team-toggle {
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+            transform: rotate(180deg);
+        }
+
+        .team-toggle.collapsed {
+            transform: rotate(0deg);
+        }
+
+        .team-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .team-list.collapsed {
+            display: none;
+        }
+
+        .team-member {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .member-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .member-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .member-contacts {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .contact-item .icon {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+
+        .contact-item a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent-primary);
+        }
+
+        .contact-badge {
+            font-size: 0.65rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 500;
+        }
+
+        .contact-badge.work {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .contact-badge.personal {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent-violet);
+        }
+
+        /* Portfolio/Founders Section */
+        .portfolio-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .portfolio-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .portfolio-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .portfolio-company {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .portfolio-company:hover {
+            border-color: var(--border-hover);
+        }
+
+        .portfolio-company-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .portfolio-company-header:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .portfolio-company-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .portfolio-company-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .portfolio-company-name a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .portfolio-company-name a:hover {
+            color: var(--accent-primary);
+        }
+
+        .portfolio-founder-count {
+            background: var(--accent-glow);
+            color: var(--accent-primary);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .portfolio-toggle {
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .portfolio-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .portfolio-founders {
+            display: none;
+            padding: 0 1rem 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .portfolio-founders.open {
+            display: block;
+        }
+
+        .founder-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .founder-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .founder-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .founder-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .founder-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .founder-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .founder-linkedin {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            color: #fff;
+            padding: 0.5rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .founder-linkedin:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 119, 181, 0.3);
+        }
+
+        .founder-linkedin .linkedin-icon {
+            font-size: 1rem;
+        }
+
+        .no-founders {
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Legacy portfolio item style for companies without founders */
+        .portfolio-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 0.375rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .portfolio-item:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* Error State */
+        .error-message {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            border-radius: 14px;
+            padding: 1.25rem;
+            color: var(--error);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-card);
+            border: 1px dashed var(--border-color);
+            border-radius: 20px;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 6rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer .accent {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        /* Auth Header */
+        .auth-header-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .auth-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .auth-user-email {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .btn-auth {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-login:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .btn-register {
+            background: var(--gradient-accent);
+            border: none;
+            color: #000;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+        }
+
+        .btn-explore {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+
+        .btn-explore:hover {
+            background: rgba(139, 92, 246, 0.25);
+            border-color: #a78bfa;
+        }
+
+        .btn-profile {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-profile:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-logout:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Restricted Content - Clean fade effect */
+        .restricted-content {
+            position: relative;
+        }
+
+        .restricted-content.blurred .restricted-inner {
+            opacity: 0.15;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .restricted-banner {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 0;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .restricted-banner .lock-icon {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .restricted-content.blurred .restricted-banner .lock-icon {
+            opacity: 1;
+        }
+
+        .restricted-banner .restricted-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .restricted-content:not(.blurred) .restricted-banner .lock-icon {
+            display: none;
+        }
+
+        .restricted-banner .btn-register-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-family: inherit;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 0.5rem;
+        }
+
+        .restricted-banner .btn-register-cta:hover {
+            background: var(--accent-secondary);
+        }
+
+        /* Results Locked Overlay for non-authenticated users */
+        .results-locked-overlay {
+            grid-column: 1 / -1;
+            background: linear-gradient(180deg, rgba(26, 26, 31, 0.95) 0%, rgba(26, 26, 31, 1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .locked-content {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .locked-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .locked-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .locked-content p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .more-funds-matched {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--accent-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1.5rem 0;
+            margin-top: 1rem;
+        }
+
+        .btn-unlock-results {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-unlock-results:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            header {
+                padding: 2rem 0;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .btn-search {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .profile-header {
+                flex-direction: column;
+            }
+
+            .investor-header {
+                flex-direction: column;
+            }
+
+            .match-score {
+                align-items: flex-start;
+                flex-direction: row;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Founder Approach Guide Styles */
+        .approach-guide-section {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.08) 0%, rgba(0, 184, 148, 0.03) 100%);
+            border: 1px solid rgba(0, 212, 170, 0.25);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .approach-guide-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 0.5rem;
+        }
+
+        .approach-guide-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .approach-guide-toggle {
+            color: var(--accent-primary);
+            transition: transform 0.2s;
+            transform: rotate(180deg);
+        }
+
+        .approach-guide-toggle.collapsed {
+            transform: rotate(0deg);
+        }
+
+        .approach-guide-content {
+            display: block;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(0, 212, 170, 0.15);
+        }
+
+        .approach-guide-content.collapsed {
+            display: none;
+        }
+
+        .approach-summary {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--accent-primary);
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .approach-block {
+            margin-bottom: 1rem;
+        }
+
+        .approach-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .approach-block h4 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .approach-block p {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .approach-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .approach-list li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.35rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .approach-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .approach-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0.4rem;
+            color: var(--accent-primary);
+        }
+
+        .approach-list.tips li::before {
+            content: '✓';
+            color: #10b981;
+        }
+
+        .approach-list.warnings li::before {
+            content: '✗';
+            color: #f59e0b;
+        }
+
+        .approach-interests {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+        }
+
+        .approach-interest-tag {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent-primary);
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Research Sources Styles */
+        .approach-sources {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(0, 212, 170, 0.1);
+        }
+
+        .sources-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .sources-title {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .sources-count {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent-primary);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .sources-toggle {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        .sources-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .sources-list {
+            display: none;
+            padding-top: 0.5rem;
+        }
+
+        .sources-list.open {
+            display: block;
+        }
+
+        .source-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .source-link:last-child {
+            border-bottom: none;
+        }
+
+        .source-link:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .source-icon {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .source-url {
+            color: var(--accent-primary);
+            font-size: 0.7rem;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        .source-domain {
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            margin-top: 0.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <!-- Auth Header Bar -->
+    <div class="auth-header-bar" id="authHeaderBar">
+        <!-- Will be populated by JavaScript -->
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+                <span class="logo-text">Investor Match</span>
+            </div>
+            <p class="tagline">Enter your company's website and get relevant VCs matches</p>
+            
+        </header>
+
+        <section class="search-section">
+            <div class="search-card">
+                
+                <form class="search-form" id="searchForm">
+                    <div class="input-wrapper">
+                        <span class="input-icon">🌐</span>
+                        <input 
+                            type="text" 
+                            id="websiteInput" 
+                            placeholder="Enter your company's website (e.g., stripe.com)"
+                            autocomplete="off"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn-search" id="searchBtn">
+                        <span>Let's Go</span>
+                        <span>→</span>
+                    </button>
+                </form>
+            </div>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">
+                Built with <span style="color: var(--accent-primary); font-weight: 600;">♥</span> from CyberPunk
+            </p>
+        </section>
+
+        <section class="loading-state" id="loadingState">
+            <div class="loading-steps">
+                <div class="loading-step" id="step1">
+                    <div class="step-icon">🌐</div>
+                    <div class="step-text">
+                        <div class="step-title">Analyzing Company</div>
+                        <div class="step-subtitle">Fetching content and metadata</div>
+                    </div>
+                </div>
+                <div class="loading-step" id="step2">
+                    <div class="step-icon">🤖</div>
+                    <div class="step-text">
+                        <div class="step-title">AI Analysis</div>
+                        <div class="step-subtitle">Understanding your business with AI</div>
+                    </div>
+                </div>
+                <div class="loading-step" id="step3">
+                    <div class="step-icon">🔍</div>
+                    <div class="step-text">
+                        <div class="step-title">Matching Investors</div>
+                        <div class="step-subtitle">Finding the best matches from 19K+ funds</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="errorContainer"></div>
+
+        <section class="company-profile" id="companyProfile">
+            <div class="profile-header">
+                <div class="profile-icon">🏢</div>
+                <div class="profile-info">
+                    <h2 id="companyName">Company Name</h2>
+                    <div class="industry" id="companyIndustry">Industry</div>
+                    <p class="description" id="companyDescription">Description</p>
+                </div>
+            </div>
+            <div class="profile-tags" id="companyTags"></div>
+            <div class="profile-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Business Model</span>
+                    <span class="meta-value" id="companyModel">-</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Target Market</span>
+                    <span class="meta-value" id="companyMarket">-</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Geography</span>
+                    <span class="meta-value" id="companyGeo">-</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Estimated Stage</span>
+                    <span class="meta-value" id="companyStage">-</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h2>
+                    <span>💼</span>
+                    Matching Investors
+                </h2>
+                <span class="results-count" id="resultsCount">0 matches</span>
+            </div>
+            <div class="investors-grid" id="investorsGrid"></div>
+        </section>
+    </div>
+
+    <script>
+        // Global auth state
+        let isAuthenticated = false;
+        let currentUser = null;
+
+        // Load stats and auth on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Promise.all([loadStats(), checkAuth()]);
+            
+            // If user is authenticated, try to load their cached results
+            if (isAuthenticated && currentUser && currentUser.company_website) {
+                document.getElementById('websiteInput').value = currentUser.company_website;
+                await loadCachedResults();
+            }
+        });
+        
+        async function loadCachedResults() {
+            try {
+                const response = await fetch('/api/my-investors');
+                const data = await response.json();
+                
+                if (data.has_cached && data.investors) {
+                    // Display cached results without re-searching
+                    displayCompanyProfile(data.company);
+                    displayInvestors(data.investors, data.company);
+                } else if (currentUser.company_website) {
+                    // No cached results, perform initial search
+                    performSearch(currentUser.company_website);
+                }
+            } catch (error) {
+                console.error('Failed to load cached results:', error);
+                // Fallback to search if cache fails
+                if (currentUser.company_website) {
+                    performSearch(currentUser.company_website);
+                }
+            }
+        }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/me');
+                const data = await response.json();
+                
+                isAuthenticated = data.authenticated;
+                currentUser = data.user || null;
+                
+                updateAuthUI();
+            } catch (error) {
+                console.error('Failed to check auth:', error);
+                isAuthenticated = false;
+                currentUser = null;
+                updateAuthUI();
+            }
+        }
+
+        function updateAuthUI() {
+            const authBar = document.getElementById('authHeaderBar');
+            
+            if (isAuthenticated && currentUser) {
+                authBar.innerHTML = `
+                    <a href="/explore.html" class="btn-auth btn-explore">🔍 Explore Funds</a>
+                    <a href="/profile.html" class="btn-auth btn-profile">👤 ${escapeHtml(currentUser.email)}</a>
+                    <button class="btn-auth btn-logout" onclick="logout()">Sign Out</button>
+                `;
+            } else {
+                authBar.innerHTML = `
+                    <a href="/explore.html" class="btn-auth btn-explore">🔍 Explore Funds</a>
+                    <a href="/login.html" class="btn-auth btn-login">Sign In</a>
+                    <a href="/register.html" class="btn-auth btn-register">Register Free</a>
+                `;
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                isAuthenticated = false;
+                currentUser = null;
+                updateAuthUI();
+                // Refresh the page to re-blur content
+                window.location.reload();
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                
+                document.getElementById('statInvestors').textContent = formatNumber(stats.investors);
+                document.getElementById('statTeam').textContent = formatNumber(stats.team_members);
+                document.getElementById('statEmails').textContent = formatNumber(stats.team_with_emails);
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num?.toLocaleString() || '-';
+        }
+
+        // Search form handler
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const websiteUrl = document.getElementById('websiteInput').value.trim();
+            if (!websiteUrl) return;
+            
+            await performSearch(websiteUrl);
+        });
+
+        async function performSearch(websiteUrl) {
+            const searchBtn = document.getElementById('searchBtn');
+            const loadingState = document.getElementById('loadingState');
+            const errorContainer = document.getElementById('errorContainer');
+            const companyProfile = document.getElementById('companyProfile');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            // Reset UI
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '<div class="spinner"></div><span>Analyzing...</span>';
+            errorContainer.innerHTML = '';
+            companyProfile.classList.remove('visible');
+            resultsSection.classList.remove('visible');
+            loadingState.classList.add('active');
+            
+            // Reset loading steps
+            document.querySelectorAll('.loading-step').forEach(step => {
+                step.classList.remove('active', 'complete');
+            });
+            
+            try {
+                // Animate loading steps
+                animateStep('step1');
+                await delay(500);
+                completeStep('step1');
+                animateStep('step2');
+                
+                // Make API call
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ website_url: websiteUrl })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Search failed');
+                }
+                
+                completeStep('step2');
+                animateStep('step3');
+                await delay(300);
+                completeStep('step3');
+                
+                await delay(500);
+                loadingState.classList.remove('active');
+                
+                // Display results
+                displayCompanyProfile(data.company);
+                displayInvestors(data.investors, data.company);
+                
+            } catch (error) {
+                loadingState.classList.remove('active');
+                errorContainer.innerHTML = `
+                    <div class="error-message">
+                        <span>⚠️</span>
+                        <span>${error.message}</span>
+                    </div>
+                `;
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.innerHTML = '<span>Investor Match</span><span>→</span>';
+            }
+        }
+
+        function animateStep(stepId) {
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        function completeStep(stepId) {
+            const step = document.getElementById(stepId);
+            step.classList.remove('active');
+            step.classList.add('complete');
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function displayCompanyProfile(company) {
+            document.getElementById('companyName').textContent = company.company_name || 'Unknown Company';
+            document.getElementById('companyIndustry').textContent = company.industry || 'Unknown Industry';
+            document.getElementById('companyDescription').textContent = company.description || '';
+            document.getElementById('companyModel').textContent = company.business_model || '-';
+            document.getElementById('companyMarket').textContent = company.target_market || '-';
+            document.getElementById('companyGeo').textContent = company.geography || '-';
+            document.getElementById('companyStage').textContent = company.estimated_stage || '-';
+            
+            // Display tags
+            const tagsContainer = document.getElementById('companyTags');
+            const allTags = [...(company.tags || []), ...(company.focus_areas || [])];
+            tagsContainer.innerHTML = allTags.slice(0, 10).map((tag, i) => 
+                `<span class="profile-tag ${i < 3 ? 'highlight' : ''}">${escapeHtml(tag)}</span>`
+            ).join('');
+            
+            document.getElementById('companyProfile').classList.add('visible');
+        }
+
+        function displayInvestors(investors, company) {
+            const grid = document.getElementById('investorsGrid');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsCount = document.getElementById('resultsCount');
+            
+            resultsCount.textContent = `${investors.length} match${investors.length !== 1 ? 'es' : ''}`;
+            
+            if (investors.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <h3>No matching investors found</h3>
+                        <p>Try a different website or check if the URL is correct</p>
+                    </div>
+                `;
+                resultsSection.classList.add('visible');
+                return;
+            }
+            
+            const companyTags = new Set([
+                ...(company.tags || []).map(t => t.toLowerCase()),
+                ...(company.focus_areas || []).map(t => t.toLowerCase())
+            ]);
+            
+            // For non-authenticated users, show first 1 result fully (with emails), then show registration prompt
+            const FREE_PREVIEW_COUNT = 1;
+            const visibleInvestors = isAuthenticated ? investors : investors.slice(0, FREE_PREVIEW_COUNT);
+            const hiddenCount = isAuthenticated ? 0 : Math.max(0, investors.length - FREE_PREVIEW_COUNT);
+            
+            // First result is completely open (showContent=true, hideUnlockButton=true for non-auth), rest are blurred
+            let html = visibleInvestors.map((inv, index) => createInvestorCard(inv, companyTags, index, true, !isAuthenticated && index === 0)).join('');
+            
+            // Add registration prompt for hidden results
+            if (!isAuthenticated && hiddenCount > 0) {
+                html += `
+                    <div class="more-funds-matched">...and ${hiddenCount} More Funds Matched to ${company.company_name || 'Your Company'}</div>
+                    <div class="results-locked-overlay">
+                        <div class="locked-content">
+                            <a href="/register.html" class="btn-unlock-results">Register Free to Unlock All Results</a>
+                            <p style="color: var(--accent-primary); font-size: 0.9rem; margin-top: 0.75rem;">🚀 Learn What Each Fund is Excited About</p>
+                            <p style="color: var(--accent-primary); font-size: 0.9rem; margin-top: 0.5rem;">🚀 Get Personal Emails for All VCs</p>
+                            <p style="color: var(--accent-primary); font-size: 0.9rem; margin-top: 0.5rem;">🚀 Connect With Founders From Recent Investments</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html;
+            resultsSection.classList.add('visible');
+            
+            // Add click handlers for team toggles
+            document.querySelectorAll('.team-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const toggle = header.querySelector('.team-toggle');
+                    const list = header.nextElementSibling;
+                    toggle.classList.toggle('collapsed');
+                    list.classList.toggle('collapsed');
+                });
+            });
+        }
+
+        function createInvestorCard(investor, companyTags, index, showContent = false, hideUnlockButton = false) {
+            const checkSize = formatCheckSize(investor.check_size);
+            const stages = (investor.stages || []).slice(0, 4).join(', ');
+            
+            // Mark matching tags
+            const tags = (investor.tags || []).slice(0, 8).map(tag => {
+                const isMatch = companyTags.has(tag.toLowerCase());
+                return `<span class="investor-tag ${isMatch ? 'match' : ''}">${escapeHtml(tag)}</span>`;
+            }).join('');
+            
+            // Team members with emails
+            const teamWithEmails = (investor.team || []).filter(t => 
+                (t.emails && t.emails.length > 0) || 
+                (t.work_emails && t.work_emails.length > 0) ||
+                (t.personal_emails && t.personal_emails.length > 0)
+            );
+            
+            // Determine if content should be blurred - show content for first 2 results even for non-auth users
+            const blurClass = (isAuthenticated || showContent) ? '' : 'blurred';
+            
+            const teamHtml = teamWithEmails.length > 0 ? `
+                <div class="restricted-content ${blurClass}">
+                    <div class="restricted-banner">
+                        <span class="lock-icon">🔒</span>
+                        <span class="restricted-title">${teamWithEmails.length} VC Contacts Available</span>
+                        ${!isAuthenticated && !hideUnlockButton ? `<a href="/register.html" class="btn-register-cta">Unlock</a>` : ''}
+                    </div>
+                    <div class="restricted-inner">
+                        <div class="team-section">
+                            <div class="team-header">
+                                <div class="team-title">
+                                    <span>📧</span>
+                                    VCs Personal Emails
+                                    <span class="team-count">${teamWithEmails.length}</span>
+                                    <span class="team-toggle">▼</span>
+                                </div>
+                            </div>
+                            <div class="team-list">
+                                ${teamWithEmails.slice(0, 10).map(member => createTeamMemberCard(member)).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ` : '';
+            
+            // Portfolio with Founders
+            const portfolioHtml = investor.recent_investments && investor.recent_investments.length > 0 ? `
+                <div class="restricted-content ${blurClass}">
+                    <div class="restricted-banner">
+                        <span class="lock-icon">🔒</span>
+                        <span class="restricted-title">Recent Fund Investments</span>
+                        ${!isAuthenticated && !hideUnlockButton ? `<a href="/register.html" class="btn-register-cta">Unlock</a>` : ''}
+                    </div>
+                    <div class="restricted-inner">
+                        <div class="portfolio-section">
+                            <div class="portfolio-title">
+                                <span>🤝</span>
+                                Connect with Founders from Recent Investments
+                            </div>
+                            <div class="portfolio-list">
+                                ${investor.recent_investments.slice(0, 5).map((inv, invIndex) => 
+                                    createPortfolioCompanyCard(inv, investor.id, invIndex)
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ` : '';
+            
+            return `
+                <div class="investor-card" style="animation-delay: ${index * 0.05}s">
+                    <div class="investor-header">
+                        <div class="investor-main">
+                            <div class="investor-name">
+                                ${investor.website ? 
+                                    `<a href="${investor.website}" target="_blank">${escapeHtml(investor.name)}</a>` :
+                                    escapeHtml(investor.name)
+                                }
+                                ${investor.verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
+                            </div>
+                            <div class="investor-location">
+                                📍 ${escapeHtml(investor.location || 'Location unknown')}
+                            </div>
+                        </div>
+                        <div class="match-score">
+                            <div class="score-value">${investor.match_score}</div>
+                            <div class="score-label">Match Score</div>
+                        </div>
+                    </div>
+                    
+                    ${investor.description ? `<p class="investor-description">${escapeHtml(investor.description)}</p>` : ''}
+                    
+                    <div class="investor-meta">
+                        ${checkSize ? `
+                            <div class="investor-meta-item">
+                                <span class="investor-meta-label">Check Size</span>
+                                <span class="investor-meta-value">${checkSize}</span>
+                            </div>
+                        ` : ''}
+                        ${stages ? `
+                            <div class="investor-meta-item">
+                                <span class="investor-meta-label">Stages</span>
+                                <span class="investor-meta-value">${stages}</span>
+                            </div>
+                        ` : ''}
+                        ${investor.portfolio_count ? `
+                            <div class="investor-meta-item">
+                                <span class="investor-meta-label">Portfolio</span>
+                                <span class="investor-meta-value">${investor.portfolio_count} companies</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${tags ? `<div class="investor-tags">${tags}</div>` : ''}
+                    ${investor.approach_guide ? createApproachGuideHtml(investor) : ''}
+                    ${teamHtml}
+                    ${portfolioHtml}
+                </div>
+            `;
+        }
+
+        function createApproachGuideHtml(investor) {
+            const guide = investor.approach_guide;
+            if (!guide) return '';
+            
+            const guideId = `approach-${investor.id}`;
+            
+            return `
+                <div class="approach-guide-section">
+                    <div class="approach-guide-header" onclick="toggleApproachGuide('${guideId}')">
+                        <div class="approach-guide-title">
+                            <span>🎯</span>
+                            <span>Founder Approach Guide</span>
+                            <span class="approach-guide-toggle" id="toggle-${guideId}">▼</span>
+                        </div>
+                    </div>
+                    <div class="approach-guide-content" id="content-${guideId}">
+                        ${guide.summary ? `<div class="approach-summary">${escapeHtml(guide.summary)}</div>` : ''}
+                        
+                        ${guide.investment_thesis ? `
+                            <div class="approach-block">
+                                <h4>💡 Investment Thesis</h4>
+                                <p>${escapeHtml(guide.investment_thesis)}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${guide.what_excites_them ? `
+                            <div class="approach-block">
+                                <h4>🔥 What Excites Them</h4>
+                                <p>${escapeHtml(guide.what_excites_them)}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${guide.approach_tips && guide.approach_tips.length > 0 ? `
+                            <div class="approach-block">
+                                <h4>✅ How to Approach</h4>
+                                <ul class="approach-list tips">
+                                    ${guide.approach_tips.slice(0, 4).map(tip => `<li>${escapeHtml(tip)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${guide.red_flags && guide.red_flags.length > 0 ? `
+                            <div class="approach-block">
+                                <h4>⚠️ What to Avoid</h4>
+                                <ul class="approach-list warnings">
+                                    ${guide.red_flags.slice(0, 3).map(flag => `<li>${escapeHtml(flag)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${guide.talking_points && guide.talking_points.length > 0 ? `
+                            <div class="approach-block">
+                                <h4>💬 Talking Points</h4>
+                                <ul class="approach-list">
+                                    ${guide.talking_points.slice(0, 3).map(point => `<li>${escapeHtml(point)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${guide.personal_interests && guide.personal_interests.length > 0 ? `
+                            <div class="approach-block">
+                                <h4>🎾 Personal Interests</h4>
+                                <div class="approach-interests">
+                                    ${guide.personal_interests.map(interest => `<span class="approach-interest-tag">${escapeHtml(interest)}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${guide.sources && guide.sources.length > 0 ? `
+                            <div class="approach-sources">
+                                <div class="sources-header" onclick="toggleSources('${guideId}')">
+                                    <div class="sources-title">
+                                        <span>📚</span>
+                                        <span>Research Sources</span>
+                                        <span class="sources-count">${guide.sources.length} links</span>
+                                        <span class="sources-toggle" id="sources-toggle-${guideId}">▼</span>
+                                    </div>
+                                </div>
+                                <div class="sources-list" id="sources-list-${guideId}">
+                                    ${guide.sources.slice(0, 10).map(url => {
+                                        const domain = extractDomain(url);
+                                        const displayUrl = url.length > 60 ? url.substring(0, 60) + '...' : url;
+                                        return `
+                                            <a href="${url}" target="_blank" class="source-link" onclick="event.stopPropagation()">
+                                                <span class="source-icon">🔗</span>
+                                                <div>
+                                                    <div class="source-url">${escapeHtml(displayUrl)}</div>
+                                                    <div class="source-domain">${escapeHtml(domain)}</div>
+                                                </div>
+                                            </a>
+                                        `;
+                                    }).join('')}
+                                    ${guide.sources.length > 10 ? `<div class="source-domain" style="padding: 0.5rem 0; text-align: center;">+ ${guide.sources.length - 10} more sources</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function extractDomain(url) {
+            try {
+                const urlObj = new URL(url);
+                return urlObj.hostname.replace('www.', '');
+            } catch {
+                return url;
+            }
+        }
+
+        function toggleSources(guideId) {
+            const toggle = document.getElementById(`sources-toggle-${guideId}`);
+            const list = document.getElementById(`sources-list-${guideId}`);
+            
+            if (toggle && list) {
+                toggle.classList.toggle('open');
+                list.classList.toggle('open');
+            }
+        }
+
+        function toggleApproachGuide(guideId) {
+            const toggle = document.getElementById(`toggle-${guideId}`);
+            const content = document.getElementById(`content-${guideId}`);
+            
+            if (toggle && content) {
+                toggle.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            }
+        }
+
+        function createPortfolioCompanyCard(investment, investorId, index) {
+            const hasFounders = investment.founders && investment.founders.length > 0;
+            const foundersWithLinkedIn = hasFounders ? investment.founders.filter(f => f.linkedin_url) : [];
+            const cardId = `portfolio-${investorId}-${index}`;
+            
+            if (!hasFounders) {
+                // Simple card for companies without founder data
+                return investment.website ? 
+                    `<a href="${investment.website}" target="_blank" class="portfolio-item">${escapeHtml(investment.company)}</a>` :
+                    `<span class="portfolio-item">${escapeHtml(investment.company)}</span>`;
+            }
+            
+            const foundersHtml = investment.founders.map(founder => `
+                <div class="founder-card">
+                    <div class="founder-info">
+                        <div class="founder-avatar">${getInitials(founder.name)}</div>
+                        <div class="founder-details">
+                            <div class="founder-name">${escapeHtml(founder.name)}</div>
+                            <div class="founder-title">${escapeHtml(founder.title || 'Founder')}</div>
+                        </div>
+                    </div>
+                    ${founder.linkedin_url ? `
+                        <a href="${founder.linkedin_url}" target="_blank" class="founder-linkedin">
+                            <span class="linkedin-icon">in</span>
+                            <span>Connect</span>
+                        </a>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            return `
+                <div class="portfolio-company" data-card-id="${cardId}">
+                    <div class="portfolio-company-header" onclick="togglePortfolioFounders('${cardId}')">
+                        <div class="portfolio-company-info">
+                            <span class="portfolio-company-name">
+                                ${investment.website ? 
+                                    `<a href="${investment.website}" target="_blank" onclick="event.stopPropagation()">${escapeHtml(investment.company)}</a>` :
+                                    escapeHtml(investment.company)
+                                }
+                            </span>
+                            ${foundersWithLinkedIn.length > 0 ? 
+                                `<span class="portfolio-founder-count">${foundersWithLinkedIn.length} founder${foundersWithLinkedIn.length > 1 ? 's' : ''} on LinkedIn</span>` :
+                                `<span class="portfolio-founder-count">${investment.founders.length} founder${investment.founders.length > 1 ? 's' : ''}</span>`
+                            }
+                            <span class="portfolio-toggle" id="toggle-${cardId}">▼</span>
+                        </div>
+                    </div>
+                    <div class="portfolio-founders" id="founders-${cardId}">
+                        ${foundersHtml || '<div class="no-founders">No founder information available</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function togglePortfolioFounders(cardId) {
+            const toggle = document.getElementById(`toggle-${cardId}`);
+            const founders = document.getElementById(`founders-${cardId}`);
+            
+            if (toggle && founders) {
+                toggle.classList.toggle('open');
+                founders.classList.toggle('open');
+            }
+        }
+
+        function createTeamMemberCard(member) {
+            const initials = getInitials(member.name);
+            
+            let contactsHtml = '';
+            
+            // Work emails
+            if (member.work_emails && member.work_emails.length > 0) {
+                contactsHtml += member.work_emails.map(email => `
+                    <div class="contact-item">
+                        <span class="icon">📧</span>
+                        <a href="mailto:${email}">${email}</a>
+                        <span class="contact-badge work">Work</span>
+                    </div>
+                `).join('');
+            }
+            
+            // Personal emails
+            if (member.personal_emails && member.personal_emails.length > 0) {
+                contactsHtml += member.personal_emails.map(email => `
+                    <div class="contact-item">
+                        <span class="icon">📧</span>
+                        <a href="mailto:${email}">${email}</a>
+                        <span class="contact-badge personal">Personal</span>
+                    </div>
+                `).join('');
+            }
+            
+            // Other emails (if not already shown)
+            if (member.emails && member.emails.length > 0) {
+                const shownEmails = new Set([
+                    ...(member.work_emails || []),
+                    ...(member.personal_emails || [])
+                ]);
+                const otherEmails = member.emails.filter(e => !shownEmails.has(e));
+                contactsHtml += otherEmails.map(email => `
+                    <div class="contact-item">
+                        <span class="icon">📧</span>
+                        <a href="mailto:${email}">${email}</a>
+                    </div>
+                `).join('');
+            }
+            
+            // Phones
+            if (member.phones && member.phones.length > 0) {
+                contactsHtml += member.phones.map(phone => `
+                    <div class="contact-item">
+                        <span class="icon">📱</span>
+                        <a href="tel:${phone}">${phone}</a>
+                    </div>
+                `).join('');
+            }
+            
+            // LinkedIn
+            if (member.linkedin_url) {
+                contactsHtml += `
+                    <div class="contact-item">
+                        <span class="icon">🔗</span>
+                        <a href="${member.linkedin_url}" target="_blank">LinkedIn Profile</a>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="team-member">
+                    <div class="member-header">
+                        <div class="member-avatar">${initials}</div>
+                        <div class="member-info">
+                            <div class="member-name">${escapeHtml(member.name)}</div>
+                            <div class="member-title">${escapeHtml(member.title || '')}</div>
+                        </div>
+                    </div>
+                    <div class="member-contacts">
+                        ${contactsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatCheckSize(checkSize) {
+            if (!checkSize) return '';
+            
+            const { min, max, sweet_spot } = checkSize;
+            
+            if (sweet_spot) {
+                return formatMoney(sweet_spot) + ' (sweet spot)';
+            }
+            
+            if (min && max) {
+                return `${formatMoney(min)} - ${formatMoney(max)}`;
+            }
+            
+            if (min) return `${formatMoney(min)}+`;
+            if (max) return `Up to ${formatMoney(max)}`;
+            
+            return '';
+        }
+
+        function formatMoney(amount) {
+            if (!amount) return '';
+            const num = parseFloat(amount);
+            if (num >= 1000000000) return `$${(num / 1000000000).toFixed(1)}B`;
+            if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
+            if (num >= 1000) return `$${(num / 1000).toFixed(0)}K`;
+            return `$${num.toLocaleString()}`;
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
+

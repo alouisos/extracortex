@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Funds | Investor Match</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --bg-card: #0c0c12;
+            --bg-card-hover: #12121a;
+            --bg-input: #0a0a10;
+            --accent-primary: #00d4aa;
+            --accent-secondary: #00b894;
+            --accent-glow: rgba(0, 212, 170, 0.15);
+            --accent-violet: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --text-primary: #ffffff;
+            --text-secondary: #c0c0d0;
+            --text-muted: #8080a0;
+            --border-color: #1a1a25;
+            --border-hover: #2a2a3a;
+            --success: #00d4aa;
+            --warning: #fbbf24;
+            --error: #f43f5e;
+            --gradient-accent: linear-gradient(135deg, #00d4aa 0%, #00b894 50%, #059669 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: 
+                linear-gradient(rgba(0, 212, 170, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.02) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-primary);
+        }
+
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .user-email:hover {
+            color: var(--accent-primary);
+        }
+
+        .btn-logout {
+            padding: 0.4rem 0.8rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Main Layout */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            grid-column: 1 / -1;
+            margin-bottom: 1rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.25rem 1rem 3rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .btn-search {
+            padding: 1rem 2rem;
+            background: var(--gradient-accent);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+        }
+
+        .search-hint {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .search-hint code {
+            background: var(--bg-input);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        /* Filters Sidebar */
+        .filters-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .filter-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .filter-checkbox input {
+            accent-color: var(--accent-primary);
+        }
+
+        .filter-checkbox:hover {
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .filter-toggle input {
+            accent-color: var(--accent-primary);
+        }
+
+        .btn-clear-filters {
+            width: 100%;
+            padding: 0.6rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear-filters:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* Results Section */
+        .results-section {
+            min-height: 400px;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-count {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .results-count strong {
+            color: var(--accent-primary);
+        }
+
+        .parsed-query {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .parsed-query strong {
+            color: var(--accent-primary);
+        }
+
+        /* Fund Cards Grid */
+        .funds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .fund-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .fund-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .fund-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .fund-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .verified-badge {
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--accent-primary);
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .fund-location {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .fund-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .fund-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .fund-meta-item {
+            background: var(--bg-input);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .fund-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .fund-tag {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: var(--accent-violet);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .fund-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .matching-team {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+            padding: 0.5rem 0.75rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .matching-team-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .matching-team-name {
+            font-size: 0.8rem;
+            color: var(--accent-violet);
+            font-weight: 600;
+            background: rgba(139, 92, 246, 0.15);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .matching-team-more {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .fund-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .fund-stat {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .fund-stat strong {
+            color: var(--accent-primary);
+        }
+
+        .btn-view-fund {
+            padding: 0.4rem 0.8rem;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view-fund:hover {
+            background: var(--accent-secondary);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Fund Detail Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            background: var(--bg-input);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .detail-value a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .detail-value a:hover {
+            text-decoration: underline;
+        }
+
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .detail-tag {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: var(--accent-violet);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .detail-tag.stage {
+            background: rgba(0, 212, 170, 0.1);
+            border-color: rgba(0, 212, 170, 0.2);
+            color: var(--accent-primary);
+        }
+
+        /* Team Members */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .team-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .team-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .team-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #000;
+        }
+
+        .team-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .team-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .team-contacts {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .team-contact {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .team-contact a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .team-contact a:hover {
+            text-decoration: underline;
+        }
+
+        /* Portfolio */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .portfolio-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.875rem;
+        }
+
+        .portfolio-company {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .portfolio-company a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .portfolio-company a:hover {
+            color: var(--accent-primary);
+        }
+
+        .portfolio-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .portfolio-founders {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+        }
+
+        .founder-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
+
+        .founder-link:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Results Locked Overlay for non-authenticated users */
+        .results-locked-overlay {
+            grid-column: 1 / -1;
+            background: linear-gradient(180deg, rgba(26, 26, 31, 0.95) 0%, rgba(26, 26, 31, 1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .locked-content {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .locked-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .locked-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .locked-content p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .btn-unlock-results {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-unlock-results:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Login Required */
+        .login-required {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .login-required h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-required p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .btn-login-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--gradient-accent);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-login-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-sidebar {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .filter-section {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .funds-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Founder Approach Guide Styles */
+        .approach-guide {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.05) 0%, rgba(0, 184, 148, 0.02) 100%);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .approach-guide .detail-section-title {
+            color: var(--accent-primary);
+        }
+
+        .approach-summary {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .approach-summary p {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .approach-block {
+            margin-bottom: 1.25rem;
+        }
+
+        .approach-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .approach-block h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .approach-block p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .approach-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .approach-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .approach-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .approach-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0.5rem;
+            color: var(--accent-primary);
+        }
+
+        .approach-list.tips li::before {
+            content: '✓';
+            color: #10b981;
+        }
+
+        .approach-list.warnings li::before {
+            content: '✗';
+            color: #f59e0b;
+        }
+
+        .interest-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .interest-tag {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent-primary);
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .approach-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .approach-footer small {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* Research Sources Styles */
+        .approach-sources {
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 212, 170, 0.15);
+        }
+
+        .sources-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .sources-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .sources-count {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .sources-toggle {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        .sources-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .sources-list {
+            display: none;
+            padding-top: 0.75rem;
+        }
+
+        .sources-list.open {
+            display: block;
+        }
+
+        .source-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .source-link:last-child {
+            border-bottom: none;
+        }
+
+        .source-link:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .source-icon {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            margin-top: 0.15rem;
+        }
+
+        .source-url {
+            color: var(--accent-primary);
+            font-size: 0.8rem;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        .source-domain {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            margin-top: 0.15rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🎯</div>
+                <span class="logo-text">Investor Match</span>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Investor Match</a>
+                <a href="/explore.html" class="nav-link active">Explore Funds</a>
+                <a href="/profile.html" class="nav-link" id="profileNavLink" style="display: none;">Profile</a>
+            </nav>
+            <div class="auth-section" id="authSection">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container" id="mainContent">
+        <!-- Will be populated by JS based on auth state -->
+    </main>
+
+    <!-- Fund Detail Modal -->
+    <div class="modal-overlay" id="fundModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Fund Name</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let isAuthenticated = false;
+        let currentUser = null;
+        let currentPage = 1;
+        let totalPages = 1;
+        let filterOptions = null;
+        let currentFilters = {};
+        let totalDatabaseFunds = 19300; // Default, will be updated from stats
+        let freePreviewFundIds = new Set(); // Track fund IDs that can be viewed without auth
+
+        // Initialize - allow non-authenticated users to see limited results
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadStats();
+            await loadFilterOptions();
+            renderMainContent();
+            performSearch();
+        });
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                totalDatabaseFunds = stats.investors || 19300;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/me');
+                const data = await response.json();
+                isAuthenticated = data.authenticated;
+                currentUser = data.user || null;
+                updateAuthUI();
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                isAuthenticated = false;
+            }
+        }
+
+        function updateAuthUI() {
+            const authSection = document.getElementById('authSection');
+            const profileNavLink = document.getElementById('profileNavLink');
+            if (isAuthenticated && currentUser) {
+                authSection.innerHTML = `
+                    <a href="/profile.html" class="user-email">👤 ${escapeHtml(currentUser.email)}</a>
+                    <button class="btn-logout" onclick="logout()">Sign Out</button>
+                `;
+                // Show profile link in nav
+                if (profileNavLink) profileNavLink.style.display = 'inline';
+            } else {
+                authSection.innerHTML = `
+                    <a href="/login.html" class="nav-link">Sign In</a>
+                    <a href="/register.html" class="btn-login-cta">Register Free</a>
+                `;
+                // Hide profile link when not logged in
+                if (profileNavLink) profileNavLink.style.display = 'none';
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/';
+        }
+
+        function renderLoginRequired() {
+            document.getElementById('mainContent').innerHTML = `
+                <div class="login-required" style="grid-column: 1 / -1;">
+                    <h2>🔒 Login Required</h2>
+                    <p>Please login or register to explore our database of 19,000+ investors</p>
+                    <a href="/register.html" class="btn-login-cta">Register Free →</a>
+                </div>
+            `;
+        }
+
+        async function loadFilterOptions() {
+            try {
+                const response = await fetch('/api/funds/filters');
+                filterOptions = await response.json();
+            } catch (error) {
+                console.error('Failed to load filters:', error);
+            }
+        }
+
+        function renderMainContent() {
+            document.getElementById('mainContent').innerHTML = `
+                <!-- Search Section -->
+                <section class="search-section">
+                    <div class="search-box">
+                        <div class="search-input-wrapper">
+                            <span class="search-icon">🔍</span>
+                            <input 
+                                type="text" 
+                                class="search-input" 
+                                id="searchInput"
+                                placeholder="Search by fund name, investor name, or use natural language like Series A healthcare funds or B2B SaaS investors in NYC"
+                            >
+                        </div>
+                        <button class="btn-search" onclick="performSearch()">Search</button>
+                    </div>
+                </section>
+
+                <!-- Filters Sidebar -->
+                <aside class="filters-sidebar">
+                    <div class="filter-section">
+                        <div class="filter-title">Filters</div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Stage</label>
+                            <div class="filter-checkboxes" id="stageFilters">
+                                ${renderStageFilters()}
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Focus Area</label>
+                            <select class="filter-select" id="focusFilter" onchange="performSearch()">
+                                <option value="">Any focus</option>
+                                ${renderFocusOptions()}
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Check Size</label>
+                            <select class="filter-select" id="checkSizeFilter" onchange="performSearch()">
+                                <option value="">Any size</option>
+                                <option value="0-100000">Under $100K</option>
+                                <option value="100000-500000">$100K - $500K</option>
+                                <option value="500000-1000000">$500K - $1M</option>
+                                <option value="1000000-5000000">$1M - $5M</option>
+                                <option value="5000000-10000000">$5M - $10M</option>
+                                <option value="10000000-">$10M+</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Country</label>
+                            <select class="filter-select" id="locationFilter" onchange="onLocationChange()">
+                                <option value="">Any location</option>
+                                ${renderLocationOptions()}
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group" id="usCityFilterGroup">
+                            <label class="filter-label">US City</label>
+                            <select class="filter-select" id="usCityFilter" onchange="performSearch()">
+                                <option value="">Any city</option>
+                                ${renderUSCityOptions()}
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Recently Active</label>
+                            <select class="filter-select" id="recentlyActiveFilter" onchange="performSearch()">
+                                <option value="">Any time</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                                <option value="180">Last 6 months</option>
+                                <option value="365">Last year</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-toggle">
+                                <input type="checkbox" id="hasContactsFilter" onchange="performSearch()">
+                                <span>Has contact info</span>
+                            </label>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-toggle">
+                                <input type="checkbox" id="verifiedFilter" onchange="performSearch()">
+                                <span>Verified only</span>
+                            </label>
+                        </div>
+                        
+                        <button class="btn-clear-filters" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                </aside>
+
+                <!-- Results Section -->
+                <section class="results-section">
+                    <div class="results-header">
+                        <span class="results-count" id="resultsCount">Loading...</span>
+                    </div>
+                    <div id="parsedQuery"></div>
+                    <div class="funds-grid" id="fundsGrid">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Searching funds...</span>
+                        </div>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </section>
+            `;
+
+            // Add enter key handler for search
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+            
+            // Check for query parameter and pre-fill search
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryParam = urlParams.get('q');
+            if (queryParam) {
+                document.getElementById('searchInput').value = queryParam;
+            }
+        }
+
+        function renderStageFilters() {
+            const stages = ['Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Growth'];
+            return stages.map(stage => `
+                <label class="filter-checkbox">
+                    <input type="checkbox" value="${stage}" onchange="performSearch()">
+                    <span>${stage}</span>
+                </label>
+            `).join('');
+        }
+
+        function renderLocationOptions() {
+            if (!filterOptions?.locations) return '';
+            return filterOptions.locations.slice(0, 50).map(loc => {
+                const selected = loc === 'United States' ? 'selected' : '';
+                return `<option value="${escapeHtml(loc)}" ${selected}>${escapeHtml(loc)}</option>`;
+            }).join('');
+        }
+
+        function renderUSCityOptions() {
+            if (!filterOptions?.us_cities) return '';
+            return filterOptions.us_cities.map(city => 
+                `<option value="${escapeHtml(city.name)}">${escapeHtml(city.name)} (${city.count})</option>`
+            ).join('');
+        }
+
+        function onLocationChange() {
+            const locationFilter = document.getElementById('locationFilter');
+            const usCityFilterGroup = document.getElementById('usCityFilterGroup');
+            const usCityFilter = document.getElementById('usCityFilter');
+            
+            if (locationFilter.value === 'United States') {
+                usCityFilterGroup.style.display = 'block';
+            } else {
+                usCityFilterGroup.style.display = 'none';
+                if (usCityFilter) usCityFilter.value = '';
+            }
+            
+            performSearch();
+        }
+
+        function renderFocusOptions() {
+            if (!filterOptions?.focuses) return '';
+            return filterOptions.focuses.map(f => 
+                `<option value="${escapeHtml(f.name)}">${escapeHtml(f.name)} (${f.count})</option>`
+            ).join('');
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('searchInput')?.value || '';
+            
+            // Gather filters
+            const stages = Array.from(document.querySelectorAll('#stageFilters input:checked'))
+                .map(cb => cb.value);
+            
+            const checkSizeValue = document.getElementById('checkSizeFilter')?.value || '';
+            let check_size_min = null, check_size_max = null;
+            if (checkSizeValue) {
+                const [min, max] = checkSizeValue.split('-');
+                check_size_min = min ? parseInt(min) : null;
+                check_size_max = max ? parseInt(max) : null;
+            }
+            
+            const location = document.getElementById('locationFilter')?.value || '';
+            const usCity = document.getElementById('usCityFilter')?.value || '';
+            const focus = document.getElementById('focusFilter')?.value || '';
+            const recentlyActiveDays = document.getElementById('recentlyActiveFilter')?.value || '';
+            const has_contacts = document.getElementById('hasContactsFilter')?.checked || false;
+            const verified_only = document.getElementById('verifiedFilter')?.checked || false;
+
+            const filters = {
+                query,
+                stages: stages.length ? stages : undefined,
+                focuses: focus ? [focus] : undefined,
+                locations: location ? [location] : undefined,
+                us_city: usCity || undefined,
+                check_size_min,
+                check_size_max,
+                has_contacts: has_contacts || undefined,
+                verified_only: verified_only || undefined,
+                recently_active_days: recentlyActiveDays ? parseInt(recentlyActiveDays) : undefined,
+                page: currentPage,
+                limit: 24
+            };
+
+            // Show loading
+            document.getElementById('fundsGrid').innerHTML = `
+                <div class="loading" style="grid-column: 1 / -1;">
+                    <div class="spinner"></div>
+                    <span>Searching funds...</span>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/funds/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(filters)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Search failed');
+                }
+
+                const data = await response.json();
+                renderResults(data);
+            } catch (error) {
+                console.error('Search error:', error);
+                document.getElementById('fundsGrid').innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="icon">⚠️</div>
+                        <h3>Search failed</h3>
+                        <p>Please try again</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderResults(data) {
+            const { results, total, page, total_pages, parsed_query, person_search, direct_search } = data;
+            currentPage = page;
+            totalPages = total_pages;
+
+            // Update count - show different message for person/direct search
+            let countMessage = `Found <strong>${total.toLocaleString()}</strong> funds`;
+            if (person_search) {
+                countMessage = `Found <strong>${total.toLocaleString()}</strong> fund${total !== 1 ? 's' : ''} with matching team member`;
+            } else if (direct_search) {
+                countMessage = `Found <strong>${total.toLocaleString()}</strong> matching fund${total !== 1 ? 's' : ''}`;
+            }
+            document.getElementById('resultsCount').innerHTML = countMessage;
+
+            // Show parsed query if natural language was used
+            const parsedQueryEl = document.getElementById('parsedQuery');
+            if (parsed_query && Object.keys(parsed_query).length > 0) {
+                const parts = [];
+                if (parsed_query.person_name) parts.push(`👤 Person: "${parsed_query.person_name}"`);
+                if (parsed_query.name) parts.push(`🏢 Fund: "${parsed_query.name}"`);
+                if (parsed_query.stages?.length) parts.push(`Stages: ${parsed_query.stages.join(', ')}`);
+                if (parsed_query.focuses?.length) parts.push(`Focus: ${parsed_query.focuses.join(', ')}`);
+                if (parsed_query.locations?.length) parts.push(`Location: ${parsed_query.locations.join(', ')}`);
+                if (parsed_query.check_size_min || parsed_query.check_size_max) {
+                    parts.push(`Check size: ${formatMoney(parsed_query.check_size_min)} - ${formatMoney(parsed_query.check_size_max)}`);
+                }
+                parsedQueryEl.innerHTML = `
+                    <div class="parsed-query">
+                        <strong>🔍 Search:</strong> ${parts.join(' • ')}
+                    </div>
+                `;
+            } else {
+                parsedQueryEl.innerHTML = '';
+            }
+
+            // Render fund cards - for non-authenticated users, show first 3 cards fully open
+            const FREE_PREVIEW_COUNT = 3;
+            const visibleResults = isAuthenticated ? results : results.slice(0, FREE_PREVIEW_COUNT);
+            const hiddenCount = isAuthenticated ? 0 : Math.max(0, results.length - FREE_PREVIEW_COUNT);
+            
+            // Track which fund IDs are in the free preview (for non-auth users)
+            if (!isAuthenticated) {
+                freePreviewFundIds = new Set(visibleResults.map(f => f.id));
+            }
+            
+            if (results.length === 0) {
+                document.getElementById('fundsGrid').innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="icon">🔍</div>
+                        <h3>No funds found</h3>
+                        <p>Try adjusting your filters or search query</p>
+                    </div>
+                `;
+            } else {
+                let html = visibleResults.map(fund => renderFundCard(fund)).join('');
+                
+                // Add registration prompt for hidden results
+                if (!isAuthenticated && hiddenCount > 0) {
+                    html += `
+                        <div class="results-locked-overlay">
+                            <div class="locked-content">
+                                <h3>${totalDatabaseFunds.toLocaleString()} Worldwide Funds Available</h3>
+                                <a href="/register.html" class="btn-unlock-results">Register Free to Unlock All Funds</a>
+                                <p style="color: var(--accent-primary); font-size: 0.9rem; margin-top: 0.75rem;">🚀 Personal Emails for All Investors</p>
+                                <p style="color: var(--accent-primary); font-size: 0.9rem; margin-top: 0.5rem;">🚀 How to Approach and what to Avoid For Each Fund</p>
+                                <p style="color: var(--accent-primary); font-size: 0.9rem; margin-top: 0.5rem;">🚀 Connections with Recently Funded Founders</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('fundsGrid').innerHTML = html;
+            }
+
+            // Render pagination (only for authenticated users)
+            renderPagination();
+        }
+
+        function renderFundCard(fund) {
+            const checkSize = formatCheckSize(fund.check_size);
+            const stages = (fund.stages || []).slice(0, 3).join(', ');
+            
+            // Show matching team members if present (from person search)
+            const matchingTeamHtml = fund.matching_team_members && fund.matching_team_members.length > 0 
+                ? `<div class="matching-team">
+                    <span class="matching-team-label">👤 Matching:</span>
+                    ${fund.matching_team_members.slice(0, 3).map(name => 
+                        `<span class="matching-team-name">${escapeHtml(name)}</span>`
+                    ).join('')}
+                    ${fund.matching_team_members.length > 3 ? `<span class="matching-team-more">+${fund.matching_team_members.length - 3} more</span>` : ''}
+                </div>`
+                : '';
+            
+            return `
+                <div class="fund-card" onclick="viewFund('${fund.id}')">
+                    <div class="fund-header">
+                        <div class="fund-name">
+                            ${escapeHtml(fund.name)}
+                            ${fund.verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="fund-location">📍 ${escapeHtml(fund.location || 'Location unknown')}</div>
+                    ${matchingTeamHtml}
+                    ${fund.description ? `<p class="fund-description">${escapeHtml(fund.description)}</p>` : ''}
+                    <div class="fund-meta">
+                        ${checkSize ? `<span class="fund-meta-item">💰 ${checkSize}</span>` : ''}
+                        ${stages ? `<span class="fund-meta-item">📊 ${stages}</span>` : ''}
+                    </div>
+                    <div class="fund-tags">
+                        ${(fund.tags || []).slice(0, 5).map(tag => 
+                            `<span class="fund-tag">${escapeHtml(tag)}</span>`
+                        ).join('')}
+                    </div>
+                    <div class="fund-footer">
+                        <div class="fund-stats">
+                            <span class="fund-stat"><strong>${fund.contacts_count}</strong> contacts</span>
+                            <span class="fund-stat"><strong>${fund.portfolio_count}</strong> portfolio</span>
+                        </div>
+                        <button class="btn-view-fund">View Details</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPagination() {
+            // Hide pagination for non-authenticated users
+            if (!isAuthenticated || totalPages <= 1) {
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('pagination').innerHTML = `
+                <button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    ← Previous
+                </button>
+                <span class="pagination-info">Page ${currentPage} of ${totalPages}</span>
+                <button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next →
+                </button>
+            `;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            performSearch();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('#stageFilters input').forEach(cb => cb.checked = false);
+            document.getElementById('focusFilter').value = '';
+            document.getElementById('checkSizeFilter').value = '';
+            document.getElementById('locationFilter').value = 'United States';
+            document.getElementById('usCityFilter').value = '';
+            document.getElementById('usCityFilterGroup').style.display = 'block';
+            document.getElementById('recentlyActiveFilter').value = '';
+            document.getElementById('hasContactsFilter').checked = false;
+            document.getElementById('verifiedFilter').checked = false;
+            currentPage = 1;
+            performSearch();
+        }
+
+        async function viewFund(fundId) {
+            const modal = document.getElementById('fundModal');
+            const modalBody = document.getElementById('modalBody');
+            const modalTitle = document.getElementById('modalTitle');
+
+            modal.classList.add('active');
+            
+            // For non-authenticated users, check if this fund is in the free preview
+            const isFreePreview = freePreviewFundIds.has(fundId);
+            if (!isAuthenticated && !isFreePreview) {
+                modalTitle.textContent = '🔒 Registration Required';
+                modalBody.innerHTML = `
+                    <div class="locked-content" style="text-align: center; padding: 3rem 2rem;">
+                        <div class="locked-icon">🔒</div>
+                        <h3>Unlock Full Fund Details</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register free to view complete fund information including VC personal emails, portfolio companies, and recently invested founder LinkedIn profiles.</p>
+                        <a href="/register.html" class="btn-unlock-results">Register Free to Unlock</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            modalTitle.textContent = 'Loading...';
+            modalBody.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <span>Loading fund details...</span>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/api/funds/${fundId}`);
+                if (!response.ok) throw new Error('Failed to load fund');
+                
+                const fund = await response.json();
+                renderFundDetails(fund);
+            } catch (error) {
+                console.error('Error loading fund:', error);
+                modalBody.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <h3>Failed to load fund details</h3>
+                    </div>
+                `;
+            }
+        }
+
+        function renderFundDetails(fund) {
+            document.getElementById('modalTitle').innerHTML = `
+                ${escapeHtml(fund.name)}
+                ${fund.verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
+            `;
+
+            const checkSize = formatCheckSize(fund.check_size);
+            
+            document.getElementById('modalBody').innerHTML = `
+                <!-- Overview -->
+                <div class="detail-section">
+                    <h3 class="detail-section-title">📋 Overview</h3>
+                    ${fund.description ? `<p style="color: var(--text-secondary); margin-bottom: 1rem;">${escapeHtml(fund.description)}</p>` : ''}
+                    ${fund.thesis ? `<p style="color: var(--text-muted); font-style: italic; margin-bottom: 1rem;">"${escapeHtml(fund.thesis)}"</p>` : ''}
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value">📍 ${escapeHtml(fund.location || 'Unknown')}</div>
+                        </div>
+                        ${checkSize ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Check Size</div>
+                                <div class="detail-value">💰 ${checkSize}</div>
+                            </div>
+                        ` : ''}
+                        ${fund.fund_size ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Fund Size</div>
+                                <div class="detail-value">${formatMoney(fund.fund_size)}</div>
+                            </div>
+                        ` : ''}
+                        ${fund.website ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Website</div>
+                                <div class="detail-value"><a href="${fund.website}" target="_blank">${fund.website}</a></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Founder Approach Guide -->
+                ${fund.approach_guide ? `
+                    <div class="detail-section approach-guide">
+                        <h3 class="detail-section-title">🎯 Founder Approach Guide</h3>
+                        <div class="approach-summary">
+                            <p>${escapeHtml(fund.approach_guide.summary || '')}</p>
+                        </div>
+                        
+                        ${fund.approach_guide.investment_thesis ? `
+                            <div class="approach-block">
+                                <h4>💡 Investment Thesis</h4>
+                                <p>${escapeHtml(fund.approach_guide.investment_thesis)}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${fund.approach_guide.what_excites_them ? `
+                            <div class="approach-block">
+                                <h4>🔥 What Excites Them</h4>
+                                <p>${escapeHtml(fund.approach_guide.what_excites_them)}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${fund.approach_guide.approach_tips?.length ? `
+                            <div class="approach-block">
+                                <h4>✅ How to Approach</h4>
+                                <ul class="approach-list tips">
+                                    ${fund.approach_guide.approach_tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${fund.approach_guide.red_flags?.length ? `
+                            <div class="approach-block">
+                                <h4>⚠️ What to Avoid</h4>
+                                <ul class="approach-list warnings">
+                                    ${fund.approach_guide.red_flags.map(flag => `<li>${escapeHtml(flag)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${fund.approach_guide.talking_points?.length ? `
+                            <div class="approach-block">
+                                <h4>💬 Talking Points</h4>
+                                <ul class="approach-list">
+                                    ${fund.approach_guide.talking_points.map(point => `<li>${escapeHtml(point)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${fund.approach_guide.personal_interests?.length ? `
+                            <div class="approach-block">
+                                <h4>🎾 Personal Interests</h4>
+                                <div class="interest-tags">
+                                    ${fund.approach_guide.personal_interests.map(interest => `<span class="interest-tag">${escapeHtml(interest)}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${fund.approach_guide.sources?.length ? `
+                            <div class="approach-sources">
+                                <div class="sources-header" onclick="toggleModalSources()">
+                                    <div class="sources-title">
+                                        <span>📚</span>
+                                        <span>Research Sources</span>
+                                        <span class="sources-count">${fund.approach_guide.sources.length} links</span>
+                                    </div>
+                                    <span class="sources-toggle" id="modal-sources-toggle">▼</span>
+                                </div>
+                                <div class="sources-list" id="modal-sources-list">
+                                    ${fund.approach_guide.sources.slice(0, 15).map(url => {
+                                        const domain = extractDomain(url);
+                                        const displayUrl = url.length > 70 ? url.substring(0, 70) + '...' : url;
+                                        return `
+                                            <a href="${url}" target="_blank" class="source-link">
+                                                <span class="source-icon">🔗</span>
+                                                <div>
+                                                    <div class="source-url">${escapeHtml(displayUrl)}</div>
+                                                    <div class="source-domain">${escapeHtml(domain)}</div>
+                                                </div>
+                                            </a>
+                                        `;
+                                    }).join('')}
+                                    ${fund.approach_guide.sources.length > 15 ? `<div class="source-domain" style="padding: 0.75rem 0; text-align: center;">+ ${fund.approach_guide.sources.length - 15} more sources</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                    </div>
+                ` : ''}
+
+                <!-- Stages & Focus -->
+                <div class="detail-section">
+                    <h3 class="detail-section-title">🎯 Investment Focus</h3>
+                    <div class="detail-tags">
+                        ${(fund.stages || []).map(s => `<span class="detail-tag stage">${escapeHtml(s)}</span>`).join('')}
+                        ${(fund.focus || []).map(f => `<span class="detail-tag">${escapeHtml(f)}</span>`).join('')}
+                        ${(fund.tags || []).slice(0, 10).map(t => `<span class="detail-tag">${escapeHtml(t)}</span>`).join('')}
+                    </div>
+                </div>
+
+                <!-- Team -->
+                ${fund.team && fund.team.length > 0 ? `
+                    <div class="detail-section">
+                        <h3 class="detail-section-title">👥 Team (${fund.team.length} members)</h3>
+                        <div class="team-grid">
+                            ${fund.team.slice(0, 12).map(member => renderTeamMember(member)).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Portfolio -->
+                ${fund.portfolio && fund.portfolio.length > 0 ? `
+                    <div class="detail-section">
+                        <h3 class="detail-section-title">💼 Recent Portfolio (${fund.portfolio_count} total)</h3>
+                        <div class="portfolio-grid">
+                            ${fund.portfolio.slice(0, 12).map(inv => renderPortfolioItem(inv)).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Links -->
+                <div class="detail-section">
+                    <h3 class="detail-section-title">🔗 Links</h3>
+                    <div class="detail-grid">
+                        ${fund.linkedin_url ? `
+                            <div class="detail-item">
+                                <div class="detail-label">LinkedIn</div>
+                                <div class="detail-value"><a href="${fund.linkedin_url}" target="_blank">View Profile</a></div>
+                            </div>
+                        ` : ''}
+                        ${fund.twitter_url ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Twitter</div>
+                                <div class="detail-value"><a href="${fund.twitter_url}" target="_blank">@${fund.twitter_url.split('/').pop()}</a></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTeamMember(member) {
+            const initials = getInitials(member.name);
+            const emails = [...(member.work_emails || []), ...(member.personal_emails || []), ...(member.emails || [])];
+            
+            return `
+                <div class="team-card">
+                    <div class="team-card-header">
+                        <div class="team-avatar">${initials}</div>
+                        <div class="team-info">
+                            <h4>${escapeHtml(member.name)}</h4>
+                            <p>${escapeHtml(member.title || '')}</p>
+                        </div>
+                    </div>
+                    <div class="team-contacts">
+                        ${emails.slice(0, 2).map(email => `
+                            <div class="team-contact">
+                                <span>📧</span>
+                                <a href="mailto:${email}">${email}</a>
+                            </div>
+                        `).join('')}
+                        ${member.linkedin_url ? `
+                            <div class="team-contact">
+                                <span>🔗</span>
+                                <a href="${member.linkedin_url}" target="_blank">LinkedIn</a>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPortfolioItem(inv) {
+            return `
+                <div class="portfolio-card">
+                    <div class="portfolio-company">
+                        ${inv.website ? 
+                            `<a href="${inv.website}" target="_blank">${escapeHtml(inv.company)}</a>` :
+                            escapeHtml(inv.company)
+                        }
+                    </div>
+                    <div class="portfolio-meta">
+                        ${inv.date ? new Date(inv.date).toLocaleDateString() : ''}
+                        ${inv.amount ? ` • ${formatMoney(inv.amount)}` : ''}
+                    </div>
+                    ${inv.founders && inv.founders.length > 0 ? `
+                        <div class="portfolio-founders">
+                            ${inv.founders.map(f => f.linkedin_url ? 
+                                `<a href="${f.linkedin_url}" target="_blank" class="founder-link">
+                                    <span>in</span> ${escapeHtml(f.name)}
+                                </a>` : ''
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('fundModal').classList.remove('active');
+        }
+
+        // Close modal on overlay click
+        document.getElementById('fundModal').addEventListener('click', (e) => {
+            if (e.target.id === 'fundModal') closeModal();
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function formatMoney(amount) {
+            if (!amount) return '';
+            if (amount >= 1000000000) return '$' + (amount / 1000000000).toFixed(1) + 'B';
+            if (amount >= 1000000) return '$' + (amount / 1000000).toFixed(1) + 'M';
+            if (amount >= 1000) return '$' + (amount / 1000).toFixed(0) + 'K';
+            return '$' + amount.toLocaleString();
+        }
+
+        function formatCheckSize(checkSize) {
+            if (!checkSize) return '';
+            const { min, max, sweet_spot } = checkSize;
+            if (sweet_spot) return formatMoney(sweet_spot) + ' (sweet spot)';
+            if (min && max) return formatMoney(min) + ' - ' + formatMoney(max);
+            if (max) return 'Up to ' + formatMoney(max);
+            if (min) return formatMoney(min) + '+';
+            return '';
+        }
+
+        function extractDomain(url) {
+            try {
+                const urlObj = new URL(url);
+                return urlObj.hostname.replace('www.', '');
+            } catch {
+                return url;
+            }
+        }
+
+        function toggleModalSources() {
+            const toggle = document.getElementById('modal-sources-toggle');
+            const list = document.getElementById('modal-sources-list');
+            
+            if (toggle && list) {
+                toggle.classList.toggle('open');
+                list.classList.toggle('open');
+            }
+        }
+    </script>
+
+    <footer style="text-align: center; padding: 3rem 0; margin-top: 4rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.9rem;">
+        Built with <span style="color: var(--accent-primary); font-weight: 600;">♥</span> from CyberPunk
+    </footer>
+</body>
+</html>
+

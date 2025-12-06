@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | Investor Match</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --bg-card: #0c0c12;
+            --bg-card-hover: #12121a;
+            --bg-input: #0a0a10;
+            --accent-primary: #00d4aa;
+            --accent-secondary: #00b894;
+            --accent-glow: rgba(0, 212, 170, 0.15);
+            --accent-violet: #8b5cf6;
+            --text-primary: #ffffff;
+            --text-secondary: #c0c0d0;
+            --text-muted: #8080a0;
+            --border-color: #1a1a25;
+            --border-hover: #2a2a3a;
+            --success: #00d4aa;
+            --warning: #fbbf24;
+            --error: #f43f5e;
+            --gradient-accent: linear-gradient(135deg, #00d4aa 0%, #00b894 50%, #059669 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: 
+                linear-gradient(rgba(0, 212, 170, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.02) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-primary);
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Plan Card */
+        .subscription-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .status-badge.canceled {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .status-badge.expired {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--error);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .status-badge.free {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-violet);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .subscription-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            background: var(--bg-input);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .info-value.highlight {
+            color: var(--accent-primary);
+        }
+
+        .btn-cancel {
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: 1px solid var(--error);
+            border-radius: 10px;
+            color: var(--error);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        .btn-cancel:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-upgrade {
+            padding: 0.75rem 1.25rem;
+            background: var(--gradient-accent);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-upgrade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Profile Form */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-save {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover {
+            background: var(--accent-secondary);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Search History */
+        .search-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .search-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .search-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .search-info {
+            flex: 1;
+        }
+
+        .search-company {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .search-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-search-again {
+            padding: 0.5rem 0.75rem;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 6px;
+            color: var(--accent-primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-search-again:hover {
+            background: rgba(0, 212, 170, 0.2);
+        }
+
+        .btn-delete-search {
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-delete-search:hover {
+            color: var(--error);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+
+        /* Contact Card */
+        .contact-card {
+            text-align: center;
+        }
+
+        .contact-content {
+            padding: 1rem 0;
+        }
+
+        .contact-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-contact {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: var(--gradient-accent);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Messages */
+        .message {
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.visible {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: var(--accent-primary);
+        }
+
+        .message.error {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: var(--error);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 100%;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-body {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-modal-cancel {
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-cancel:hover {
+            border-color: var(--text-muted);
+        }
+
+        .btn-modal-confirm {
+            padding: 0.75rem 1.25rem;
+            background: var(--error);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-confirm:hover {
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .subscription-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🎯</div>
+                <span class="logo-text">Investor Match</span>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Investor Match</a>
+                <a href="/explore.html" class="nav-link">Explore Funds</a>
+                <a href="/profile.html" class="nav-link active">Profile</a>
+            </nav>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container" id="mainContent">
+        <div class="loading">
+            <div class="spinner"></div>
+            <span>Loading profile...</span>
+        </div>
+    </main>
+
+    <!-- Cancel Plan Modal -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal-content">
+            <h3 class="modal-title">⚠️ Cancel Plan?</h3>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel your subscription?</p>
+                <p style="margin-top: 0.75rem;">You will retain access to all features until your current billing period ends.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeCancelModal()">Keep Plan</button>
+                <button class="btn-modal-confirm" onclick="confirmCancel()">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let profile = null;
+
+        // Load profile on page load
+        document.addEventListener('DOMContentLoaded', loadProfile);
+
+        async function loadProfile() {
+            try {
+                const response = await fetch('/api/profile');
+                
+                if (response.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load profile');
+                }
+                
+                profile = await response.json();
+                renderProfile();
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="card">
+                        <div class="empty-state">
+                            <div class="icon">⚠️</div>
+                            <p>Failed to load profile. Please try again.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderProfile() {
+            const sub = profile.subscription;
+            const isActive = sub.is_active;
+            const isCanceled = sub.status === 'canceled';
+            const isFree = !sub.paid_at;
+            
+            let statusBadgeClass = 'active';
+            let statusText = 'Active';
+            
+            if (isFree) {
+                statusBadgeClass = 'free';
+                statusText = 'Free Trial';
+            } else if (isCanceled) {
+                statusBadgeClass = 'canceled';
+                statusText = 'Canceled';
+            } else if (!isActive) {
+                statusBadgeClass = 'expired';
+                statusText = 'Expired';
+            }
+
+            document.getElementById('mainContent').innerHTML = `
+                <h1 class="page-title">👤 My Profile</h1>
+                
+                <!-- Plan Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">💳 Plan</h2>
+                        <span class="status-badge ${statusBadgeClass}">${statusText}</span>
+                    </div>
+                    
+                    <div class="subscription-info">
+                        ${sub.paid_at ? `
+                            <div class="info-item">
+                                <div class="info-label">Subscribed Since</div>
+                                <div class="info-value">${formatDate(sub.paid_at)}</div>
+                            </div>
+                        ` : ''}
+                        ${sub.expires_at ? `
+                            <div class="info-item">
+                                <div class="info-label">${isCanceled ? 'Access Until' : 'Renews On'}</div>
+                                <div class="info-value">${formatDate(sub.expires_at)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Days Remaining</div>
+                                <div class="info-value highlight">${sub.days_remaining} days</div>
+                            </div>
+                        ` : ''}
+                        ${isCanceled && sub.canceled_at ? `
+                            <div class="info-item">
+                                <div class="info-label">Canceled On</div>
+                                <div class="info-value">${formatDate(sub.canceled_at)}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${isActive && !isCanceled && !isFree ? `
+                        <button class="btn-cancel" onclick="openCancelModal()">Cancel Plan</button>
+                    ` : ''}
+                </div>
+                
+                <!-- Account Info Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📧 Account Information</h2>
+                    </div>
+                    
+                    <div id="profileMessage" class="message"></div>
+                    
+                    <form id="profileForm" onsubmit="saveProfile(event)">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" value="${escapeHtml(profile.email)}" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Company Website</label>
+                            <input type="text" class="form-input" id="companyWebsite" value="${escapeHtml(profile.company_website || '')}" placeholder="yourcompany.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Member Since</label>
+                            <input type="text" class="form-input" value="${formatDate(profile.created_at)}" disabled>
+                        </div>
+                        
+                        <button type="submit" class="btn-save" id="saveBtn">Save Changes</button>
+                    </form>
+                </div>
+                
+                <!-- Search History Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🔍 Recent Searches</h2>
+                    </div>
+                    
+                    ${profile.search_history && profile.search_history.length > 0 ? `
+                        <div class="search-list">
+                            ${profile.search_history.map(search => {
+                                const isFundSearch = search.type === 'fund_search';
+                                const searchUrl = isFundSearch 
+                                    ? `/explore.html?q=${encodeURIComponent(search.query)}`
+                                    : `/?search=${encodeURIComponent(search.query)}`;
+                                const icon = isFundSearch ? '🏦' : '🏢';
+                                const displayName = isFundSearch 
+                                    ? `Fund Search: "${search.query}"`
+                                    : (search.company_name || search.query);
+                                return `
+                                <div class="search-item" data-id="${search.id}">
+                                    <div class="search-info">
+                                        <div class="search-company">${icon} ${escapeHtml(displayName)}</div>
+                                        <div class="search-meta">
+                                            <span>📊 ${search.matches_count} matches</span>
+                                            <span>🕐 ${formatRelativeTime(search.searched_at)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="search-actions">
+                                        <a href="${searchUrl}" class="btn-search-again">Search Again</a>
+                                        <button class="btn-delete-search" onclick="deleteSearch('${search.id}')" title="Remove">🗑️</button>
+                                    </div>
+                                </div>
+                            `}).join('')}
+                        </div>
+                    ` : `
+                        <div class="empty-state">
+                            <div class="icon">🔍</div>
+                            <p>No searches yet. Start by finding investors for your company!</p>
+                        </div>
+                    `}
+                </div>
+                
+                <!-- Contact Us Card -->
+                <div class="card contact-card">
+                    <div class="card-header">
+                        <h2 class="card-title">📧 Need Help?</h2>
+                    </div>
+                    <div class="contact-content">
+                        <p>Have questions, feedback, or need assistance? We're here to help!</p>
+                        <a href="mailto:connect@extracortex.com" class="btn-contact">
+                            <span>✉️</span>
+                            <span>Contact Us</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function saveProfile(e) {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('saveBtn');
+            const message = document.getElementById('profileMessage');
+            const companyWebsite = document.getElementById('companyWebsite').value;
+            
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            message.classList.remove('visible', 'success', 'error');
+            
+            try {
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ company_website: companyWebsite })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    message.textContent = 'Profile updated successfully!';
+                    message.classList.add('visible', 'success');
+                    profile.company_website = companyWebsite;
+                } else {
+                    message.textContent = data.error || 'Failed to update profile';
+                    message.classList.add('visible', 'error');
+                }
+            } catch (error) {
+                message.textContent = 'Connection error. Please try again.';
+                message.classList.add('visible', 'error');
+            }
+            
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+        }
+
+        function openCancelModal() {
+            document.getElementById('cancelModal').classList.add('active');
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').classList.remove('active');
+        }
+
+        async function confirmCancel() {
+            try {
+                const response = await fetch('/api/cancel-subscription', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeCancelModal();
+                    // Reload profile to show updated status
+                    loadProfile();
+                } else {
+                    alert(data.error || 'Failed to cancel subscription');
+                }
+            } catch (error) {
+                alert('Connection error. Please try again.');
+            }
+        }
+
+        async function deleteSearch(searchId) {
+            try {
+                const response = await fetch('/api/delete-search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ search_id: searchId })
+                });
+                
+                if (response.ok) {
+                    // Remove from UI
+                    const item = document.querySelector(`[data-id="${searchId}"]`);
+                    if (item) {
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateX(-20px)';
+                        setTimeout(() => item.remove(), 200);
+                    }
+                    // Update local data
+                    profile.search_history = profile.search_history.filter(s => s.id !== searchId);
+                }
+            } catch (error) {
+                console.error('Failed to delete search:', error);
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/';
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function formatRelativeTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return formatDate(dateString);
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeCancelModal();
+        });
+
+        // Close modal on overlay click
+        document.getElementById('cancelModal').addEventListener('click', (e) => {
+            if (e.target.id === 'cancelModal') closeCancelModal();
+        });
+    </script>
+</body>
+</html>
+
