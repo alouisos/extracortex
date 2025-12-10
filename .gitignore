@@ -1,3 +1,4 @@
 results/
 investor-finder/node_modules/
 .env
+extracortex.pem

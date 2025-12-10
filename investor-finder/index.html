@@ -17,7 +17,8 @@
     <script type="text/javascript">
       (function(e,c){if(!c.__SV){var l,h;window.mixpanel=c;c._i=[];c.init=function(q,r,f){function t(d,a){var g=a.split(".");2==g.length&&(d=d[g[0]],a=g[1]);d[a]=function(){d.push([a].concat(Array.prototype.slice.call(arguments,0)))}}var b=c;"undefined"!==typeof f?b=c[f]=[]:f="mixpanel";b.people=b.people||[];b.toString=function(d){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);d||(a+=" (stub)");return a};b.people.toString=function(){return b.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders start_session_recording stop_session_recording people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
       for(h=0;h<l.length;h++)t(b,l[h]);var n="set set_once union unset remove delete".split(" ");b.get_group=function(){function d(p){a[p]=function(){b.push([g,[p].concat(Array.prototype.slice.call(arguments,0))])}}for(var a={},g=["get_group"].concat(Array.prototype.slice.call(arguments,0)),m=0;m<n.length;m++)d(n[m]);return a};c._i.push([q,r,f])};c.__SV=1.2;var k=e.createElement("script");k.type="text/javascript";k.async=!0;k.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===
-      e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=e.getElementsByTagName("script")[0];e.parentNode.insertBefore(k,e)}})(document,window.mixpanel||[])  mixpanel.init('14681489b91fbd92f19e8a73af8dd1af', {
+      e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=e.getElementsByTagName("script")[0];e.parentNode.insertBefore(k,e)}})(document,window.mixpanel||[]);
+      mixpanel.init('14681489b91fbd92f19e8a73af8dd1af', {
         autocapture: true,
         record_sessions_percent: 100,
       })
@@ -1273,14 +1274,36 @@
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
+                padding-top: 5rem;
             }
 
             header {
-                padding: 2rem 0;
+                padding: 1.5rem 0;
+            }
+
+            .logo {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .logo-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
             }
 
             .logo-text {
                 font-size: 1.5rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+                padding: 0 0.5rem;
+            }
+
+            .search-card {
+                padding: 1.5rem;
+                border-radius: 16px;
             }
 
             .search-form {
@@ -1290,19 +1313,88 @@
             .btn-search {
                 width: 100%;
                 justify-content: center;
+                padding: 1rem;
+            }
+
+            .input-wrapper input {
+                padding: 1rem 1rem 1rem 2.75rem;
+                font-size: 0.95rem;
+            }
+
+            .input-icon {
+                font-size: 1rem;
+                left: 0.875rem;
             }
 
             .stats-bar {
                 flex-direction: column;
                 gap: 1rem;
+                padding: 1rem;
+            }
+
+            /* Loading steps - stack vertically on mobile */
+            .loading-steps {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .loading-step {
+                min-width: auto;
+                width: 100%;
+                flex-direction: row;
+                text-align: left;
+                padding: 1rem;
+            }
+
+            .loading-step .step-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .step-text {
+                text-align: left;
+            }
+
+            /* Company profile */
+            .company-profile {
+                padding: 1.25rem;
+                border-radius: 16px;
             }
 
             .profile-header {
                 flex-direction: column;
+                gap: 1rem;
+            }
+
+            .profile-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+
+            .profile-info h2 {
+                font-size: 1.25rem;
+            }
+
+            .profile-meta {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            /* Investor cards */
+            .investor-card {
+                padding: 1.25rem;
+                border-radius: 16px;
             }
 
             .investor-header {
                 flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .investor-name {
+                font-size: 1.1rem;
+                flex-wrap: wrap;
             }
 
             .match-score {
@@ -1310,6 +1402,215 @@
                 flex-direction: row;
                 gap: 0.5rem;
             }
+
+            .score-value {
+                font-size: 1.25rem;
+            }
+
+            .investor-meta {
+                gap: 1rem;
+            }
+
+            .investor-meta-item {
+                min-width: calc(50% - 0.5rem);
+            }
+
+            .investor-tags {
+                gap: 0.375rem;
+            }
+
+            .investor-tag {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            /* Team section */
+            .team-section {
+                padding: 1rem;
+            }
+
+            .team-member {
+                padding: 0.875rem;
+            }
+
+            .member-header {
+                gap: 0.5rem;
+            }
+
+            .member-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 0.875rem;
+            }
+
+            .member-name {
+                font-size: 0.9rem;
+            }
+
+            .contact-item {
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+            }
+
+            .contact-item a {
+                word-break: break-all;
+            }
+
+            /* Portfolio section */
+            .portfolio-company-header {
+                padding: 0.625rem 0.75rem;
+            }
+
+            .portfolio-company-info {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .portfolio-company-name {
+                font-size: 0.85rem;
+            }
+
+            .founder-card {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
+
+            .founder-linkedin {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Approach guide */
+            .approach-guide-section {
+                padding: 0.875rem;
+            }
+
+            .approach-summary {
+                padding: 0.625rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .approach-block h4 {
+                font-size: 0.75rem;
+            }
+
+            .approach-block p,
+            .approach-list li {
+                font-size: 0.75rem;
+            }
+
+            /* Results header */
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .results-header h2 {
+                font-size: 1.25rem;
+            }
+
+            /* Locked overlay */
+            .results-locked-overlay {
+                padding: 2rem 1.25rem;
+            }
+
+            .locked-content h3 {
+                font-size: 1.25rem;
+            }
+
+            .locked-content p {
+                font-size: 0.9rem;
+            }
+
+            .btn-unlock-results {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            /* Footer */
+            footer {
+                margin-top: 3rem;
+                padding: 2rem 0;
+            }
+        }
+
+        /* Auth header bar - responsive */
+        @media (max-width: 768px) {
+            .auth-header-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                padding: 0.75rem 1rem;
+                background: rgba(5, 5, 8, 0.95);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--border-color);
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .btn-auth {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+
+            .auth-user-email {
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.75rem;
+                padding-top: 5rem;
+            }
+
+            header {
+                padding: 1rem 0;
+            }
+
+            .logo-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.25rem;
+            }
+
+            .logo-text {
+                font-size: 1.25rem;
+            }
+
+            .tagline {
+                font-size: 0.9rem;
+            }
+
+            .search-card {
+                padding: 1.25rem;
+            }
+
+            .profile-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .investor-meta-item {
+                min-width: 100%;
+            }
+
+            .auth-header-bar {
+                gap: 0.375rem;
+            }
+
+            .btn-auth {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.7rem;
+            }
+
         }
 
         /* Founder Approach Guide Styles */
@@ -1736,9 +2037,14 @@
                 const response = await fetch('/api/stats');
                 const stats = await response.json();
                 
-                document.getElementById('statInvestors').textContent = formatNumber(stats.investors);
-                document.getElementById('statTeam').textContent = formatNumber(stats.team_members);
-                document.getElementById('statEmails').textContent = formatNumber(stats.team_with_emails);
+                // Only update if elements exist
+                const statInvestors = document.getElementById('statInvestors');
+                const statTeam = document.getElementById('statTeam');
+                const statEmails = document.getElementById('statEmails');
+                
+                if (statInvestors) statInvestors.textContent = formatNumber(stats.investors);
+                if (statTeam) statTeam.textContent = formatNumber(stats.team_members);
+                if (statEmails) statEmails.textContent = formatNumber(stats.team_with_emails);
             } catch (error) {
                 console.error('Failed to load stats:', error);
             }

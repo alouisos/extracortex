@@ -17,7 +17,8 @@
     <script type="text/javascript">
       (function(e,c){if(!c.__SV){var l,h;window.mixpanel=c;c._i=[];c.init=function(q,r,f){function t(d,a){var g=a.split(".");2==g.length&&(d=d[g[0]],a=g[1]);d[a]=function(){d.push([a].concat(Array.prototype.slice.call(arguments,0)))}}var b=c;"undefined"!==typeof f?b=c[f]=[]:f="mixpanel";b.people=b.people||[];b.toString=function(d){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);d||(a+=" (stub)");return a};b.people.toString=function(){return b.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders start_session_recording stop_session_recording people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
       for(h=0;h<l.length;h++)t(b,l[h]);var n="set set_once union unset remove delete".split(" ");b.get_group=function(){function d(p){a[p]=function(){b.push([g,[p].concat(Array.prototype.slice.call(arguments,0))])}}for(var a={},g=["get_group"].concat(Array.prototype.slice.call(arguments,0)),m=0;m<n.length;m++)d(n[m]);return a};c._i.push([q,r,f])};c.__SV=1.2;var k=e.createElement("script");k.type="text/javascript";k.async=!0;k.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===
-      e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=e.getElementsByTagName("script")[0];e.parentNode.insertBefore(k,e)}})(document,window.mixpanel||[])  mixpanel.init('14681489b91fbd92f19e8a73af8dd1af', {
+      e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=e.getElementsByTagName("script")[0];e.parentNode.insertBefore(k,e)}})(document,window.mixpanel||[]);
+      mixpanel.init('14681489b91fbd92f19e8a73af8dd1af', {
         autocapture: true,
         record_sessions_percent: 100,
       })
@@ -276,6 +277,41 @@
             border-radius: 16px;
             padding: 1.25rem;
             margin-bottom: 1rem;
+        }
+
+        /* Mobile filter toggle button */
+        .mobile-filter-toggle {
+            display: none;
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-filter-toggle:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .mobile-filter-toggle .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-filter-toggle.open .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .filter-content-wrapper {
+            display: block;
         }
 
         .filter-title {
@@ -1035,8 +1071,60 @@
         }
 
         @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem 1rem;
+            }
+
             .header-content {
                 flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .logo-text {
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-link {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.875rem;
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                transition: all 0.2s;
+            }
+
+            .nav-link:hover, .nav-link.active {
+                background: var(--accent-glow);
+                border-color: var(--accent-primary);
+            }
+
+            .nav-link-home {
+                display: none;
+            }
+
+            .auth-section {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .user-email {
+                font-size: 0.8rem;
+            }
+
+            .main-container {
+                padding: 1rem;
                 gap: 1rem;
             }
 
@@ -1044,8 +1132,168 @@
                 flex-direction: column;
             }
 
+            .search-input {
+                padding: 0.875rem 1rem 0.875rem 2.75rem;
+                font-size: 0.95rem;
+            }
+
+            .search-icon {
+                font-size: 1rem;
+                left: 0.875rem;
+            }
+
+            .btn-search {
+                padding: 0.875rem 1.5rem;
+            }
+
+            .filters-sidebar {
+                display: block;
+                position: static;
+            }
+
+            .mobile-filter-toggle {
+                display: flex;
+            }
+
+            .filter-content-wrapper {
+                display: none;
+                animation: slideDown 0.3s ease;
+            }
+
+            .filter-content-wrapper.open {
+                display: block;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .filter-section {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
             .funds-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .fund-card {
+                padding: 1rem;
+            }
+
+            .fund-name {
+                font-size: 1rem;
+            }
+
+            .fund-description {
+                font-size: 0.8rem;
+            }
+
+            .fund-meta-item {
+                font-size: 0.7rem;
+            }
+
+            .fund-tag {
+                font-size: 0.65rem;
+            }
+
+            /* Modal responsive */
+            .modal-overlay {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                margin: 1rem auto;
+                border-radius: 16px;
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-title {
+                font-size: 1.25rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            .detail-section-title {
+                font-size: 0.9rem;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Pagination */
+            .pagination {
+                flex-wrap: wrap;
+            }
+
+            .pagination-btn {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            /* Results locked */
+            .results-locked-overlay {
+                padding: 2rem 1rem;
+            }
+
+            .locked-content h3 {
+                font-size: 1.25rem;
+            }
+
+            .btn-unlock-results {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0.75rem;
+            }
+
+            .nav-links {
+                gap: 0.375rem;
+            }
+
+            .nav-link {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.65rem;
+            }
+
+            .btn-login-cta {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .search-input {
+                padding: 0.75rem 0.875rem 0.75rem 2.5rem;
+                font-size: 0.9rem;
+            }
+
+            .btn-search {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
             }
         }
 
@@ -1261,7 +1509,7 @@
                 <span class="logo-text">Investor Match</span>
             </a>
             <nav class="nav-links">
-                <a href="/" class="nav-link">Investor Match</a>
+                <a href="/" class="nav-link nav-link-home">Investor Match</a>
                 <a href="/explore.html" class="nav-link active">Explore Funds</a>
                 <a href="/profile.html" class="nav-link" id="profileNavLink" style="display: none;">Profile</a>
             </nav>
@@ -1396,79 +1644,85 @@
 
                 <!-- Filters Sidebar -->
                 <aside class="filters-sidebar">
-                    <div class="filter-section">
-                        <div class="filter-title">Filters</div>
-                        
-                        <div class="filter-group">
-                            <label class="filter-label">Stage</label>
-                            <div class="filter-checkboxes" id="stageFilters">
-                                ${renderStageFilters()}
+                    <button class="mobile-filter-toggle" id="mobileFilterToggle" onclick="toggleMobileFilters()">
+                        <span>🎛️ Filters</span>
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                    <div class="filter-content-wrapper" id="filterContentWrapper">
+                        <div class="filter-section">
+                            <div class="filter-title">Filters</div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Stage</label>
+                                <div class="filter-checkboxes" id="stageFilters">
+                                    ${renderStageFilters()}
+                                </div>
                             </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Focus Area</label>
+                                <select class="filter-select" id="focusFilter" onchange="performSearch()">
+                                    <option value="">Any focus</option>
+                                    ${renderFocusOptions()}
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Check Size</label>
+                                <select class="filter-select" id="checkSizeFilter" onchange="performSearch()">
+                                    <option value="">Any size</option>
+                                    <option value="0-100000">Under $100K</option>
+                                    <option value="100000-500000">$100K - $500K</option>
+                                    <option value="500000-1000000">$500K - $1M</option>
+                                    <option value="1000000-5000000">$1M - $5M</option>
+                                    <option value="5000000-10000000">$5M - $10M</option>
+                                    <option value="10000000-">$10M+</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Country</label>
+                                <select class="filter-select" id="locationFilter" onchange="onLocationChange()">
+                                    <option value="">Any location</option>
+                                    ${renderLocationOptions()}
+                                </select>
+                            </div>
+
+                            <div class="filter-group" id="usCityFilterGroup">
+                                <label class="filter-label">US City</label>
+                                <select class="filter-select" id="usCityFilter" onchange="performSearch()">
+                                    <option value="">Any city</option>
+                                    ${renderUSCityOptions()}
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Recently Active</label>
+                                <select class="filter-select" id="recentlyActiveFilter" onchange="performSearch()">
+                                    <option value="">Any time</option>
+                                    <option value="30">Last 30 days</option>
+                                    <option value="90">Last 90 days</option>
+                                    <option value="180">Last 6 months</option>
+                                    <option value="365">Last year</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-toggle">
+                                    <input type="checkbox" id="hasContactsFilter" onchange="performSearch()">
+                                    <span>Has contact info</span>
+                                </label>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-toggle">
+                                    <input type="checkbox" id="verifiedFilter" onchange="performSearch()">
+                                    <span>Verified only</span>
+                                </label>
+                            </div>
+
+                            <button class="btn-clear-filters" onclick="clearFilters()">Clear Filters</button>
                         </div>
-                        
-                        <div class="filter-group">
-                            <label class="filter-label">Focus Area</label>
-                            <select class="filter-select" id="focusFilter" onchange="performSearch()">
-                                <option value="">Any focus</option>
-                                ${renderFocusOptions()}
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label class="filter-label">Check Size</label>
-                            <select class="filter-select" id="checkSizeFilter" onchange="performSearch()">
-                                <option value="">Any size</option>
-                                <option value="0-100000">Under $100K</option>
-                                <option value="100000-500000">$100K - $500K</option>
-                                <option value="500000-1000000">$500K - $1M</option>
-                                <option value="1000000-5000000">$1M - $5M</option>
-                                <option value="5000000-10000000">$5M - $10M</option>
-                                <option value="10000000-">$10M+</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label class="filter-label">Country</label>
-                            <select class="filter-select" id="locationFilter" onchange="onLocationChange()">
-                                <option value="">Any location</option>
-                                ${renderLocationOptions()}
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group" id="usCityFilterGroup">
-                            <label class="filter-label">US City</label>
-                            <select class="filter-select" id="usCityFilter" onchange="performSearch()">
-                                <option value="">Any city</option>
-                                ${renderUSCityOptions()}
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label class="filter-label">Recently Active</label>
-                            <select class="filter-select" id="recentlyActiveFilter" onchange="performSearch()">
-                                <option value="">Any time</option>
-                                <option value="30">Last 30 days</option>
-                                <option value="90">Last 90 days</option>
-                                <option value="180">Last 6 months</option>
-                                <option value="365">Last year</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label class="filter-toggle">
-                                <input type="checkbox" id="hasContactsFilter" onchange="performSearch()">
-                                <span>Has contact info</span>
-                            </label>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label class="filter-toggle">
-                                <input type="checkbox" id="verifiedFilter" onchange="performSearch()">
-                                <span>Verified only</span>
-                            </label>
-                        </div>
-                        
-                        <button class="btn-clear-filters" onclick="clearFilters()">Clear Filters</button>
                     </div>
                 </aside>
 
@@ -1779,6 +2033,16 @@
             document.getElementById('verifiedFilter').checked = false;
             currentPage = 1;
             performSearch();
+        }
+
+        function toggleMobileFilters() {
+            const toggle = document.getElementById('mobileFilterToggle');
+            const wrapper = document.getElementById('filterContentWrapper');
+            
+            if (toggle && wrapper) {
+                toggle.classList.toggle('open');
+                wrapper.classList.toggle('open');
+            }
         }
 
         async function viewFund(fundId) {
