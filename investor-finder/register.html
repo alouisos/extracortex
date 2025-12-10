@@ -501,6 +501,21 @@
     </div>
     
     <script>
+        // Track register page view on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof mixpanel !== 'undefined') {
+                const referrer = document.referrer;
+                const fromExploreFunds = referrer.includes('explore');
+                const fromInvestorMatch = referrer.includes('index') || (referrer.endsWith('/') && !fromExploreFunds);
+                
+                mixpanel.track('Register Page View', {
+                    funnel_step: fromExploreFunds ? 2 : 3,
+                    referrer: referrer,
+                    source_funnel: fromExploreFunds ? 'Explore Funds' : (fromInvestorMatch ? 'Investor Match' : 'Direct')
+                });
+            }
+        });
+
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -524,6 +539,20 @@
                 const data = await response.json();
                 
                 if (response.ok && data.success) {
+                    // Track successful registration
+                    if (typeof mixpanel !== 'undefined') {
+                        mixpanel.track('Registration Completed', {
+                            funnel_step: 4,
+                            email: email,
+                            company_website: company_website
+                        });
+                        mixpanel.identify(email);
+                        mixpanel.people.set({
+                            '$email': email,
+                            'company_website': company_website,
+                            'signup_date': new Date().toISOString()
+                        });
+                    }
                     // Registration successful - redirect to main page
                     window.location.href = '/';
                 } else {

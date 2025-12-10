@@ -1550,6 +1550,13 @@
 
         // Initialize - allow non-authenticated users to see limited results
         document.addEventListener('DOMContentLoaded', async () => {
+            // Track page view for Explore Funds funnel
+            if (typeof mixpanel !== 'undefined') {
+                mixpanel.track('Explore Funds Page View', {
+                    funnel_step: 1
+                });
+            }
+            
             await checkAuth();
             await loadStats();
             await loadFilterOptions();
@@ -1876,6 +1883,17 @@
             const { results, total, page, total_pages, parsed_query, person_search, direct_search } = data;
             currentPage = page;
             totalPages = total_pages;
+            
+            // Track fund search
+            if (typeof mixpanel !== 'undefined') {
+                const query = document.getElementById('searchInput')?.value || '';
+                mixpanel.track('Explore Funds Search', {
+                    funnel_step: 2,
+                    search_query: query,
+                    results_count: total,
+                    is_authenticated: isAuthenticated
+                });
+            }
 
             // Update count - show different message for person/direct search
             let countMessage = `Found <strong>${total.toLocaleString()}</strong> funds`;

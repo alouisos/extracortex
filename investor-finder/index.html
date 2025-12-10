@@ -1953,6 +1953,13 @@
 
         // Load stats and auth on page load
         document.addEventListener('DOMContentLoaded', async () => {
+            // Track page view
+            if (typeof mixpanel !== 'undefined') {
+                mixpanel.track('Investor Match Page View', {
+                    funnel_step: 1
+                });
+            }
+            
             await Promise.all([loadStats(), checkAuth()]);
             
             // If user is authenticated, try to load their cached results
@@ -2113,6 +2120,19 @@
                 
                 await delay(500);
                 loadingState.classList.remove('active');
+                
+                // Track successful search
+                if (typeof mixpanel !== 'undefined') {
+                    mixpanel.track('Search Completed', {
+                        page: 'Home',
+                        funnel_step: 2,
+                        website_searched: websiteUrl,
+                        company_name: data.company?.company_name || '',
+                        industry: data.company?.industry || '',
+                        matches_count: data.investors?.length || 0,
+                        is_authenticated: isAuthenticated
+                    });
+                }
                 
                 // Display results
                 displayCompanyProfile(data.company);
