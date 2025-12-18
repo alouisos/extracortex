@@ -9,6 +9,126 @@ require('dotenv').config();
 let fetch, cheerio, OpenAI;
 
 const PORT = 3000;
+
+// ============================================================================
+// Rate Limiting Configuration
+// ============================================================================
+
+const RATE_LIMIT = {
+    windowMs: 60 * 1000,        // 1 minute window
+    maxRequests: 100,           // Max 100 requests per window for general endpoints
+    maxSearchRequests: 10,      // Max 10 AI search requests per window (expensive)
+    maxAuthRequests: 5,         // Max 5 login/register attempts per window
+    blockDurationMs: 5 * 60 * 1000  // Block for 5 minutes if limit exceeded
+};
+
+// In-memory rate limit storage: IP -> { requests: [{timestamp}], blocked_until }
+const rateLimitStore = new Map();
+
+// Clean up old rate limit entries every 5 minutes
+setInterval(() => {
+    const now = Date.now();
+    for (const [ip, data] of rateLimitStore.entries()) {
+        // Remove entries older than the window + block duration
+        if (data.blocked_until && data.blocked_until < now) {
+            data.blocked_until = null;
+        }
+        // Clean old requests
+        data.requests = data.requests.filter(r => now - r.timestamp < RATE_LIMIT.windowMs);
+        data.searchRequests = (data.searchRequests || []).filter(r => now - r.timestamp < RATE_LIMIT.windowMs);
+        data.authRequests = (data.authRequests || []).filter(r => now - r.timestamp < RATE_LIMIT.windowMs);
+        // Remove empty entries
+        if (data.requests.length === 0 && !data.blocked_until) {
+            rateLimitStore.delete(ip);
+        }
+    }
+}, 5 * 60 * 1000);
+
+// Get client IP from request (handles proxies)
+function getClientIP(req) {
+    // Check for forwarded IP (when behind proxy/load balancer)
+    const forwarded = req.headers['x-forwarded-for'];
+    if (forwarded) {
+        return forwarded.split(',')[0].trim();
+    }
+    const realIP = req.headers['x-real-ip'];
+    if (realIP) {
+        return realIP.trim();
+    }
+    // Fallback to socket address
+    return req.socket?.remoteAddress || req.connection?.remoteAddress || 'unknown';
+}
+
+// Check rate limit for an IP
+function checkRateLimit(ip, type = 'general') {
+    const now = Date.now();
+    
+    if (!rateLimitStore.has(ip)) {
+        rateLimitStore.set(ip, { 
+            requests: [], 
+            searchRequests: [],
+            authRequests: [],
+            blocked_until: null 
+        });
+    }
+    
+    const data = rateLimitStore.get(ip);
+    
+    // Check if IP is blocked
+    if (data.blocked_until && data.blocked_until > now) {
+        const remainingMs = data.blocked_until - now;
+        return { 
+            allowed: false, 
+            blocked: true,
+            retryAfter: Math.ceil(remainingMs / 1000),
+            message: `Too many requests. Please try again in ${Math.ceil(remainingMs / 1000)} seconds.`
+        };
+    }
+    
+    // Clean old entries
+    data.requests = data.requests.filter(r => now - r.timestamp < RATE_LIMIT.windowMs);
+    data.searchRequests = (data.searchRequests || []).filter(r => now - r.timestamp < RATE_LIMIT.windowMs);
+    data.authRequests = (data.authRequests || []).filter(r => now - r.timestamp < RATE_LIMIT.windowMs);
+    
+    // Determine which limit to check
+    let currentCount, maxLimit, requestArray;
+    if (type === 'search') {
+        requestArray = data.searchRequests;
+        currentCount = requestArray.length;
+        maxLimit = RATE_LIMIT.maxSearchRequests;
+    } else if (type === 'auth') {
+        requestArray = data.authRequests;
+        currentCount = requestArray.length;
+        maxLimit = RATE_LIMIT.maxAuthRequests;
+    } else {
+        requestArray = data.requests;
+        currentCount = requestArray.length;
+        maxLimit = RATE_LIMIT.maxRequests;
+    }
+    
+    // Check if limit exceeded
+    if (currentCount >= maxLimit) {
+        // Block the IP for the block duration
+        data.blocked_until = now + RATE_LIMIT.blockDurationMs;
+        console.log(`⚠️ Rate limit exceeded for IP ${ip} (${type}). Blocked until ${new Date(data.blocked_until).toISOString()}`);
+        return { 
+            allowed: false, 
+            blocked: true,
+            retryAfter: Math.ceil(RATE_LIMIT.blockDurationMs / 1000),
+            message: `Rate limit exceeded. Please try again in ${Math.ceil(RATE_LIMIT.blockDurationMs / 1000)} seconds.`
+        };
+    }
+    
+    // Add request to the appropriate counter
+    requestArray.push({ timestamp: now });
+    
+    return { 
+        allowed: true, 
+        remaining: maxLimit - currentCount - 1,
+        limit: maxLimit,
+        resetIn: Math.ceil(RATE_LIMIT.windowMs / 1000)
+    };
+}
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // Stripe Configuration
@@ -1427,31 +1547,77 @@ function serveStaticFile(filePath, res) {
 }
 
 // Send JSON response
-function sendJSON(res, statusCode, data) {
-    res.writeHead(statusCode, {
+function sendJSON(res, statusCode, data, rateLimitInfo = null) {
+    const headers = {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
-    });
+    };
+    
+    // Add rate limit headers if provided
+    if (rateLimitInfo) {
+        if (rateLimitInfo.limit !== undefined) {
+            headers['X-RateLimit-Limit'] = rateLimitInfo.limit;
+        }
+        if (rateLimitInfo.remaining !== undefined) {
+            headers['X-RateLimit-Remaining'] = rateLimitInfo.remaining;
+        }
+        if (rateLimitInfo.resetIn !== undefined) {
+            headers['X-RateLimit-Reset'] = rateLimitInfo.resetIn;
+        }
+        if (rateLimitInfo.retryAfter !== undefined) {
+            headers['Retry-After'] = rateLimitInfo.retryAfter;
+        }
+    }
+    
+    res.writeHead(statusCode, headers);
     res.end(JSON.stringify(data));
+}
+
+// Send rate limit exceeded response
+function sendRateLimitError(res, rateLimitResult) {
+    sendJSON(res, 429, { 
+        error: rateLimitResult.message,
+        retry_after: rateLimitResult.retryAfter 
+    }, rateLimitResult);
 }
 
 // Main request handler
 async function handleRequest(req, res) {
     const url = new URL(req.url, `http://localhost:${PORT}`);
+    const clientIP = getClientIP(req);
     
-    // Handle CORS preflight
+    // Handle CORS preflight (no rate limiting for OPTIONS)
     if (req.method === 'OPTIONS') {
         res.writeHead(204, {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type'
         });
         res.end();
         return;
     }
     
-    // API: Analyze and search
+    // Skip rate limiting for static files (html, css, js, images)
+    const isStaticFile = !url.pathname.startsWith('/api/');
+    
+    // Apply general rate limiting for API requests
+    if (!isStaticFile) {
+        const generalLimit = checkRateLimit(clientIP, 'general');
+        if (!generalLimit.allowed) {
+            sendRateLimitError(res, generalLimit);
+            return;
+        }
+    }
+    
+    // API: Analyze and search (AI-powered - stricter rate limiting)
     if (url.pathname === '/api/search' && req.method === 'POST') {
+        // Apply stricter rate limiting for AI search (expensive operation)
+        const searchLimit = checkRateLimit(clientIP, 'search');
+        if (!searchLimit.allowed) {
+            sendRateLimitError(res, searchLimit);
+            return;
+        }
+        
         let body = '';
         req.on('data', chunk => body += chunk);
         req.on('end', async () => {
@@ -1551,6 +1717,13 @@ async function handleRequest(req, res) {
     
     // API: Create Stripe Checkout Session for registration
     if (url.pathname === '/api/create-checkout-session' && req.method === 'POST') {
+        // Apply auth rate limiting
+        const authLimit = checkRateLimit(clientIP, 'auth');
+        if (!authLimit.allowed) {
+            sendRateLimitError(res, authLimit);
+            return;
+        }
+        
         let body = '';
         req.on('data', chunk => body += chunk);
         req.on('end', async () => {
@@ -1864,6 +2037,13 @@ async function handleRequest(req, res) {
     
     // API: Register new user (FREE - keep for testing)
     if (url.pathname === '/api/register' && req.method === 'POST') {
+        // Apply auth rate limiting
+        const authLimit = checkRateLimit(clientIP, 'auth');
+        if (!authLimit.allowed) {
+            sendRateLimitError(res, authLimit);
+            return;
+        }
+        
         let body = '';
         req.on('data', chunk => body += chunk);
         req.on('end', () => {
@@ -1924,6 +2104,13 @@ async function handleRequest(req, res) {
     
     // API: Login
     if (url.pathname === '/api/login' && req.method === 'POST') {
+        // Apply auth rate limiting (prevents brute force attacks)
+        const authLimit = checkRateLimit(clientIP, 'auth');
+        if (!authLimit.allowed) {
+            sendRateLimitError(res, authLimit);
+            return;
+        }
+        
         let body = '';
         req.on('data', chunk => body += chunk);
         req.on('end', () => {
