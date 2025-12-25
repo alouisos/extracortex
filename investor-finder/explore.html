@@ -1645,7 +1645,7 @@
                                 placeholder="Search by fund name, investor name, or use natural language like Series A healthcare funds or B2B SaaS investors in NYC"
                             >
                         </div>
-                        <button class="btn-search" onclick="performSearch()">Search</button>
+                        <button class="btn-search" onclick="performSearch(true)">Search</button>
                     </div>
                 </section>
 
@@ -1668,7 +1668,7 @@
 
                             <div class="filter-group">
                                 <label class="filter-label">Focus Area</label>
-                                <select class="filter-select" id="focusFilter" onchange="performSearch()">
+                                <select class="filter-select" id="focusFilter" onchange="performSearch(true)">
                                     <option value="">Any focus</option>
                                     ${renderFocusOptions()}
                                 </select>
@@ -1676,7 +1676,7 @@
 
                             <div class="filter-group">
                                 <label class="filter-label">Check Size</label>
-                                <select class="filter-select" id="checkSizeFilter" onchange="performSearch()">
+                                <select class="filter-select" id="checkSizeFilter" onchange="performSearch(true)">
                                     <option value="">Any size</option>
                                     <option value="0-100000">Under $100K</option>
                                     <option value="100000-500000">$100K - $500K</option>
@@ -1697,7 +1697,7 @@
 
                             <div class="filter-group" id="usCityFilterGroup">
                                 <label class="filter-label">US City</label>
-                                <select class="filter-select" id="usCityFilter" onchange="performSearch()">
+                                <select class="filter-select" id="usCityFilter" onchange="performSearch(true)">
                                     <option value="">Any city</option>
                                     ${renderUSCityOptions()}
                                 </select>
@@ -1705,7 +1705,7 @@
 
                             <div class="filter-group">
                                 <label class="filter-label">Recently Active</label>
-                                <select class="filter-select" id="recentlyActiveFilter" onchange="performSearch()">
+                                <select class="filter-select" id="recentlyActiveFilter" onchange="performSearch(true)">
                                     <option value="">Any time</option>
                                     <option value="30">Last 30 days</option>
                                     <option value="90">Last 90 days</option>
@@ -1716,14 +1716,14 @@
 
                             <div class="filter-group">
                                 <label class="filter-toggle">
-                                    <input type="checkbox" id="hasContactsFilter" onchange="performSearch()">
+                                    <input type="checkbox" id="hasContactsFilter" onchange="performSearch(true)">
                                     <span>Has contact info</span>
                                 </label>
                             </div>
 
                             <div class="filter-group">
                                 <label class="filter-toggle">
-                                    <input type="checkbox" id="verifiedFilter" onchange="performSearch()">
+                                    <input type="checkbox" id="verifiedFilter" onchange="performSearch(true)">
                                     <span>Verified only</span>
                                 </label>
                             </div>
@@ -1751,7 +1751,7 @@
 
             // Add enter key handler for search
             document.getElementById('searchInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') performSearch();
+                if (e.key === 'Enter') performSearch(true);
             });
             
             // Check for query parameter and pre-fill search
@@ -1766,7 +1766,7 @@
             const stages = ['Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Growth'];
             return stages.map(stage => `
                 <label class="filter-checkbox">
-                    <input type="checkbox" value="${stage}" onchange="performSearch()">
+                    <input type="checkbox" value="${stage}" onchange="performSearch(true)">
                     <span>${stage}</span>
                 </label>
             `).join('');
@@ -1799,7 +1799,7 @@
                 if (usCityFilter) usCityFilter.value = '';
             }
             
-            performSearch();
+            performSearch(true);
         }
 
         function renderFocusOptions() {
@@ -1809,7 +1809,19 @@
             ).join('');
         }
 
-        async function performSearch() {
+        async function performSearch(isUserAction = false) {
+            // Check if user is authenticated first
+            if (!isAuthenticated) {
+                // If user actively clicked search, redirect to register
+                if (isUserAction) {
+                    window.location.href = '/register.html?redirect=explore&message=search';
+                } else {
+                    // On page load, just show the registration prompt
+                    showRegistrationPrompt();
+                }
+                return;
+            }
+            
             const query = document.getElementById('searchInput')?.value || '';
             
             // Gather filters
@@ -1861,6 +1873,12 @@
                     body: JSON.stringify(filters)
                 });
 
+                // Handle authentication required
+                if (response.status === 401) {
+                    showRegistrationPrompt();
+                    return;
+                }
+
                 if (!response.ok) {
                     throw new Error('Search failed');
                 }
@@ -1877,6 +1895,25 @@
                     </div>
                 `;
             }
+        }
+        
+        function showRegistrationPrompt() {
+            document.getElementById('fundsGrid').innerHTML = `
+                <div class="results-locked-overlay" style="grid-column: 1 / -1;">
+                    <div class="locked-content">
+                        <div class="locked-icon">🔒</div>
+                        <h3>Register Free to Search ${totalDatabaseFunds.toLocaleString()} Funds</h3>
+                        <p>Create a free account to access our complete investor database with AI-powered search, contact information, and portfolio insights.</p>
+                        <a href="/register.html" class="btn-unlock-results">Register Free →</a>
+                        <p style="margin-top: 1rem; font-size: 0.9rem;">
+                            Already have an account? <a href="/login.html" style="color: var(--accent-primary);">Sign in</a>
+                        </p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('resultsCount').innerHTML = '';
+            document.getElementById('parsedQuery').innerHTML = '';
+            document.getElementById('pagination').innerHTML = '';
         }
 
         function renderResults(data) {
@@ -2034,7 +2071,7 @@
 
         function goToPage(page) {
             currentPage = page;
-            performSearch();
+            performSearch(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -2050,7 +2087,7 @@
             document.getElementById('hasContactsFilter').checked = false;
             document.getElementById('verifiedFilter').checked = false;
             currentPage = 1;
-            performSearch();
+            performSearch(true);
         }
 
         function toggleMobileFilters() {
@@ -2070,18 +2107,10 @@
 
             modal.classList.add('active');
             
-            // For non-authenticated users, check if this fund is in the free preview
-            const isFreePreview = freePreviewFundIds.has(fundId);
-            if (!isAuthenticated && !isFreePreview) {
-                modalTitle.textContent = '🔒 Registration Required';
-                modalBody.innerHTML = `
-                    <div class="locked-content" style="text-align: center; padding: 3rem 2rem;">
-                        <div class="locked-icon">🔒</div>
-                        <h3>Unlock Full Fund Details</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register free to view complete fund information including VC personal emails, portfolio companies, and recently invested founder LinkedIn profiles.</p>
-                        <a href="/register.html" class="btn-unlock-results">Register Free to Unlock</a>
-                    </div>
-                `;
+            // Require authentication - redirect to register page
+            if (!isAuthenticated) {
+                closeModal();
+                window.location.href = '/register.html?redirect=explore&message=fund_details';
                 return;
             }
             
@@ -2095,6 +2124,21 @@
 
             try {
                 const response = await fetch(`/api/funds/${fundId}`);
+                
+                // Handle authentication required
+                if (response.status === 401) {
+                    modalTitle.textContent = '🔒 Registration Required';
+                    modalBody.innerHTML = `
+                        <div class="locked-content" style="text-align: center; padding: 3rem 2rem;">
+                            <div class="locked-icon">🔒</div>
+                            <h3>Session Expired</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Please sign in again to view fund details.</p>
+                            <a href="/login.html" class="btn-unlock-results">Sign In</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
                 if (!response.ok) throw new Error('Failed to load fund');
                 
                 const fund = await response.json();

@@ -1085,7 +1085,8 @@ Only include fields that are clearly mentioned. Return valid JSON only.`
 }
 
 // Search funds with filters
-async function searchFunds(filters) {
+// skipAI: if true, skip OpenAI parsing to prevent API abuse from unauthenticated users
+async function searchFunds(filters, skipAI = false) {
     const {
         query,           // Natural language query
         name,            // Fund name search
@@ -1275,9 +1276,9 @@ async function searchFunds(filters) {
         }
     }
     
-    // If there's a natural language query, parse it first
+    // If there's a natural language query, parse it first (only for authenticated users)
     let parsedFilters = {};
-    if (query && query.trim()) {
+    if (query && query.trim() && !skipAI) {
         parsedFilters = await parseNaturalLanguageQuery(query) || {};
     }
     
@@ -1610,11 +1611,20 @@ async function handleRequest(req, res) {
     }
     
     // API: Analyze and search (AI-powered - stricter rate limiting)
+    // IMPORTANT: This uses OpenAI API, so we must protect against abuse
     if (url.pathname === '/api/search' && req.method === 'POST') {
         // Apply stricter rate limiting for AI search (expensive operation)
         const searchLimit = checkRateLimit(clientIP, 'search');
         if (!searchLimit.allowed) {
             sendRateLimitError(res, searchLimit);
+            return;
+        }
+        
+        // Require authentication for website analysis (uses OpenAI API)
+        const sessionToken = getSessionFromCookie(req);
+        const sessionUser = sessionToken ? findUserBySession(sessionToken) : null;
+        if (!sessionUser) {
+            sendJSON(res, 401, { error: 'Please register or login to analyze your company website' });
             return;
         }
         
@@ -1641,25 +1651,21 @@ async function handleRequest(req, res) {
                 // Step 4: Format and return results
                 const results = formatResults(matches, companyAnalysis);
                 
-                // Track search in user history and cache results if logged in
-                const sessionToken = getSessionFromCookie(req);
-                const sessionUser = sessionToken ? findUserBySession(sessionToken) : null;
-                if (sessionUser) {
-                    addSearchToHistory(sessionUser.id, {
-                        query: website_url,
-                        company_name: companyAnalysis.name || website_url,
-                        matches_count: matches.length
-                    });
-                    
-                    // Cache the results for the user's company website
-                    const user = findUserById(sessionUser.id);
-                    if (user && user.company_website && normalizeUrl(website_url) === normalizeUrl(user.company_website)) {
-                        user.cached_results = {
-                            results: results,
-                            cached_at: new Date().toISOString()
-                        };
-                        saveUsers();
-                    }
+                // Track search in user history and cache results (user is authenticated at this point)
+                addSearchToHistory(sessionUser.id, {
+                    query: website_url,
+                    company_name: companyAnalysis.name || website_url,
+                    matches_count: matches.length
+                });
+                
+                // Cache the results for the user's company website
+                const user = findUserById(sessionUser.id);
+                if (user && user.company_website && normalizeUrl(website_url) === normalizeUrl(user.company_website)) {
+                    user.cached_results = {
+                        results: results,
+                        cached_at: new Date().toISOString()
+                    };
+                    saveUsers();
                 }
                 
                 sendJSON(res, 200, results);
@@ -2179,20 +2185,30 @@ async function handleRequest(req, res) {
         return;
     }
     
-    // API: Search funds (available for all users, but non-auth users get limited results)
+    // API: Search funds - REQUIRES AUTHENTICATION
     if (url.pathname === '/api/funds/search' && req.method === 'POST') {
         const sessionToken = getSessionFromCookie(req);
         const user = sessionToken ? findUserBySession(sessionToken) : null;
+        
+        // Require authentication to prevent API abuse
+        if (!user) {
+            sendJSON(res, 401, { 
+                error: 'Authentication required',
+                message: 'Please register or login to search our investor database',
+                action: 'register'
+            });
+            return;
+        }
         
         let body = '';
         req.on('data', chunk => body += chunk);
         req.on('end', async () => {
             try {
                 const filters = JSON.parse(body);
-                const results = await searchFunds(filters);
+                const results = await searchFunds(filters, false);
                 
-                // Track fund search in user history if there's a query (only for authenticated users)
-                if (user && filters.query && filters.query.trim()) {
+                // Track fund search in user history if there's a query
+                if (filters.query && filters.query.trim()) {
                     addSearchToHistory(user.id, {
                         query: filters.query,
                         company_name: `🔍 Fund Search: "${filters.query}"`,
@@ -2210,8 +2226,21 @@ async function handleRequest(req, res) {
         return;
     }
     
-    // API: Get fund details (available to all users for preview) - must be last of /api/funds/* routes
+    // API: Get fund details - REQUIRES AUTHENTICATION
     if (url.pathname.startsWith('/api/funds/') && req.method === 'GET') {
+        const sessionToken = getSessionFromCookie(req);
+        const user = sessionToken ? findUserBySession(sessionToken) : null;
+        
+        // Require authentication to prevent API abuse
+        if (!user) {
+            sendJSON(res, 401, { 
+                error: 'Authentication required',
+                message: 'Please register or login to view fund details',
+                action: 'register'
+            });
+            return;
+        }
+        
         const fundId = url.pathname.replace('/api/funds/', '');
         const fund = getFundDetails(fundId);
         

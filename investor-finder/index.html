@@ -1967,6 +1967,7 @@
                 document.getElementById('websiteInput').value = currentUser.company_website;
                 await loadCachedResults();
             }
+            // Show registration prompt for non-authenticated users who try to search
         });
         
         async function loadCachedResults() {
@@ -2080,6 +2081,12 @@
             const companyProfile = document.getElementById('companyProfile');
             const resultsSection = document.getElementById('resultsSection');
             
+            // Check if user is authenticated first - redirect to register page
+            if (!isAuthenticated) {
+                window.location.href = '/register.html?redirect=home&message=search';
+                return;
+            }
+            
             // Reset UI
             searchBtn.disabled = true;
             searchBtn.innerHTML = '<div class="spinner"></div><span>Analyzing...</span>';
@@ -2108,6 +2115,15 @@
                 });
                 
                 const data = await response.json();
+                
+                // Handle authentication required
+                if (response.status === 401) {
+                    loadingState.classList.remove('active');
+                    showRegistrationPrompt();
+                    searchBtn.disabled = false;
+                    searchBtn.innerHTML = '<span>Let\'s Go</span><span>→</span>';
+                    return;
+                }
                 
                 if (!response.ok) {
                     throw new Error(data.error || 'Search failed');
@@ -2148,8 +2164,38 @@
                 `;
             } finally {
                 searchBtn.disabled = false;
-                searchBtn.innerHTML = '<span>Investor Match</span><span>→</span>';
+                searchBtn.innerHTML = '<span>Let\'s Go</span><span>→</span>';
             }
+        }
+        
+        function showRegistrationPrompt() {
+            const resultsSection = document.getElementById('resultsSection');
+            const investorsGrid = document.getElementById('investorsGrid');
+            const companyProfile = document.getElementById('companyProfile');
+            
+            companyProfile.classList.remove('visible');
+            resultsSection.classList.add('visible');
+            
+            investorsGrid.innerHTML = `
+                <div class="results-locked-overlay" style="grid-column: 1 / -1;">
+                    <div class="locked-content">
+                        <div class="locked-icon">🔒</div>
+                        <h3>Register Free to Find Matching Investors</h3>
+                        <p>Create a free account to analyze your company and get matched with the most relevant VCs from our database of 19,000+ funds.</p>
+                        <a href="/register.html" class="btn-unlock-results">Register Free →</a>
+                        <p style="margin-top: 1rem; font-size: 0.9rem;">
+                            Already have an account? <a href="/login.html" style="color: var(--accent-primary);">Sign in</a>
+                        </p>
+                        <div style="margin-top: 1.5rem; text-align: left; max-width: 320px; margin-left: auto; margin-right: auto;">
+                            <p style="color: var(--accent-primary); font-size: 0.9rem; margin-bottom: 0.5rem;">🚀 AI-Powered Company Analysis</p>
+                            <p style="color: var(--accent-primary); font-size: 0.9rem; margin-bottom: 0.5rem;">🚀 Personal Emails for All VCs</p>
+                            <p style="color: var(--accent-primary); font-size: 0.9rem; margin-bottom: 0.5rem;">🚀 How to Approach Each Fund</p>
+                            <p style="color: var(--accent-primary); font-size: 0.9rem;">🚀 Connect With Funded Founders</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('resultsCount').textContent = '';
         }
 
         function animateStep(stepId) {
